@@ -2,7 +2,6 @@
 import AppLayout from '../layouts/AppLayout.astro';
 import ChartCard from '../components/ChartCard.tsx';
 import CodeSearchForm from '../components/CodeSearchForm.tsx';
-import MetricCard from '../components/MetricCard.astro';
 import StatusChip from '../components/StatusChip.astro';
 import { formatDate, formatQuantity } from '../lib/formatters';
 import {
@@ -129,19 +128,6 @@ const supplierConfig = {
         <span class="meta-pill">Historico de movimentacoes</span>
       </div>
     </div>
-  </section>
-
-  <section class="metrics-grid">
-    {
-      dashboard.metrics.map((metric) => (
-        <MetricCard
-          label={metric.label}
-          value={metric.value}
-          detail={metric.detail}
-          tone={metric.tone}
-        />
-      ))
-    }
   </section>
 
   <section class="stack-grid">
