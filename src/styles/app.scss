@@ -525,6 +525,13 @@ textarea:focus {
 
 .chart-card__canvas {
   min-height: 280px;
+  max-height: 500px;
+}
+
+.chart-card__canvas canvas {
+  display: block;
+  width: 100% !important;
+  max-height: 500px;
 }
 
 .empty-state {

@@ -20,6 +20,7 @@ export default function ChartCard({
   hasData = true,
   emptyMessage = 'Sem dados suficientes para gerar este gráfico ainda.'
 }: ChartCardProps) {
+  const safeHeight = Math.min(height, 500);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -47,8 +48,12 @@ export default function ChartCard({
       </header>
 
       {hasData ? (
-        <div class="chart-card__canvas">
-          <canvas ref={canvasRef} height={height} />
+        <div class="chart-card__canvas" style={{ maxHeight: `${safeHeight}px` }}>
+          <canvas
+            ref={canvasRef}
+            height={safeHeight}
+            style={{ maxHeight: `${safeHeight}px` }}
+          />
         </div>
       ) : (
         <div class="empty-state empty-state--chart">
