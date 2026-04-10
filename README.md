@@ -81,10 +81,6 @@ DATABASE_SSL=false
 - `npm run db:logs` acompanha os logs do banco
 - `npm run db:reset` remove o volume do banco para recriar tudo do zero
 
-## Observação sobre o cadastro de produto
-
-O campo `quantidade` solicitado no produto foi interpretado como `quantidade por unidade de compra`, para funcionar junto com `unidade de compra` sem conflitar com o campo de estoque atual.
-
 ## Rotas principais
 
 - `/` dashboard

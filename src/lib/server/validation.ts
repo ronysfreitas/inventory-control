@@ -20,9 +20,6 @@ export const productInputSchema = z.object({
     .trim()
     .min(2, 'Informe o nome do produto.')
     .max(180, 'O nome deve ter no máximo 180 caracteres.'),
-  quantidadePorUnidadeCompra: numericInput.positive(
-    'A quantidade por unidade de compra deve ser maior que zero.'
-  ),
   unidadeCompra: z
     .string()
     .trim()

@@ -33,7 +33,6 @@ interface ProductQueryRow {
   id: NumericValue;
   codigo: string;
   nome: string;
-  quantidade_por_unidade_compra: NumericValue;
   unidade_compra: string;
   estoque_minimo: NumericValue;
   estoque_atual: NumericValue;
@@ -108,7 +107,6 @@ function normalizeProducts(rows: ProductQueryRow[]) {
       id: toNumber(row.id),
       codigo: row.codigo,
       nome: row.nome,
-      quantidadePorUnidadeCompra: toNumber(row.quantidade_por_unidade_compra),
       unidadeCompra: row.unidade_compra,
       estoqueMinimo: toNumber(row.estoque_minimo),
       estoqueAtual: toNumber(row.estoque_atual),
@@ -146,7 +144,6 @@ async function getProductsWithPriority() {
         p.id,
         p.codigo,
         p.nome,
-        p.quantidade_por_unidade_compra,
         p.unidade_compra,
         p.estoque_minimo,
         p.estoque_atual,
@@ -503,7 +500,6 @@ export async function getProductDetailsData(
         p.id,
         p.codigo,
         p.nome,
-        p.quantidade_por_unidade_compra,
         p.unidade_compra,
         p.estoque_minimo,
         p.estoque_atual,
@@ -698,18 +694,16 @@ export async function createProduct(payload: unknown) {
       INSERT INTO produtos (
         codigo,
         nome,
-        quantidade_por_unidade_compra,
         unidade_compra,
         estoque_minimo,
         estoque_atual
       )
-      VALUES ($1, $2, $3, $4, $5, $6)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING id, codigo
     `,
     [
       input.codigo,
       input.nome,
-      input.quantidadePorUnidadeCompra,
       input.unidadeCompra,
       input.estoqueMinimo,
       input.estoqueInicial

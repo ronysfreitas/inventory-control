@@ -84,11 +84,6 @@ export default function CreateProductForm({
         </label>
 
         <label class="field">
-          <span class="field__label">Quantidade por unidade de compra</span>
-          <input name="quantidadePorUnidadeCompra" type="number" min="0.01" step="0.01" defaultValue="1" disabled={disabled} required />
-        </label>
-
-        <label class="field">
           <span class="field__label">Unidade de compra</span>
           <input name="unidadeCompra" type="text" placeholder="saco, caixa, rolo..." disabled={disabled} required />
         </label>

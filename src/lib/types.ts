@@ -5,7 +5,6 @@ export interface ProductBase {
   id: number;
   codigo: string;
   nome: string;
-  quantidadePorUnidadeCompra: number;
   unidadeCompra: string;
   estoqueMinimo: number;
   estoqueAtual: number;

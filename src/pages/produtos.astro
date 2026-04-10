@@ -69,10 +69,7 @@ const data = await getProductCatalogData();
                     </td>
                     <td>
                       <div>{product.nome}</div>
-                      <div class="muted">
-                        {formatQuantity(product.quantidadePorUnidadeCompra)} por{' '}
-                        {product.unidadeCompra}
-                      </div>
+                      <div class="muted">{product.unidadeCompra}</div>
                     </td>
                     <td>
                       <strong>{formatQuantity(product.estoqueAtual)}</strong>
