@@ -42,6 +42,10 @@ export const productInputSchema = z.object({
   )
 });
 
+export const productUpdateSchema = productInputSchema.omit({
+  estoqueInicial: true
+});
+
 export const supplierInputSchema = z.object({
   nome: z
     .string()
@@ -115,6 +119,7 @@ export const exitInputSchema = z.object({
 });
 
 export type ProductInput = z.infer<typeof productInputSchema>;
+export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 export type SupplierInput = z.infer<typeof supplierInputSchema>;
 export type EntryInput = z.infer<typeof entryInputSchema>;
 export type ExitInput = z.infer<typeof exitInputSchema>;

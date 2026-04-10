@@ -1,30 +1,47 @@
 ---
+import '../styles/catalog-management.scss';
+
 import AppLayout from '../layouts/AppLayout.astro';
 import CodeSearchForm from '../components/CodeSearchForm.tsx';
 import CreateProductForm from '../components/CreateProductForm.tsx';
+import DeleteRecordButton from '../components/DeleteRecordButton.tsx';
 import StatusChip from '../components/StatusChip.astro';
 import { formatDate, formatQuantity } from '../lib/formatters';
 import {
   getProductCatalogData,
+  getProductForEditing,
   summarizeProductBalance
 } from '../lib/server/inventory-service';
 
-const data = await getProductCatalogData();
+const editParam = Astro.url.searchParams.get('editar');
+const editId = editParam && /^\d+$/.test(editParam) ? Number(editParam) : null;
+
+const [data, editingProduct] = await Promise.all([
+  getProductCatalogData(),
+  editId ? getProductForEditing(editId) : Promise.resolve(null)
+]);
+
+const editRequested = Boolean(editParam);
+const editNotFound = editRequested && !editingProduct && data.databaseReady;
+
+const productEditNote = editingProduct
+  ? `Estoque atual: ${formatQuantity(editingProduct.estoqueAtual)}. Ultima entrada: ${formatDate(editingProduct.lastEntryDate)}. Ultima saida: ${formatDate(editingProduct.lastExitDate)}. O saldo continua sendo atualizado por entradas e saidas.`
+  : '';
 ---
 
 <AppLayout
   title="Cadastro de produtos"
-  description="Cadastro e catálogo dos itens controlados em estoque."
+  description="Cadastro e catalogo dos itens controlados em estoque."
   currentPath="/produtos"
   databaseReady={data.databaseReady}
 >
   <section class="hero-panel hero-grid">
     <div>
       <span class="eyebrow">Cadastro principal</span>
-      <h1>Produtos com saldo, mínimo e prioridade de reposição no mesmo fluxo.</h1>
+      <h1>Produtos com saldo, minimo e prioridade de reposicao no mesmo fluxo.</h1>
       <p class="body-copy">
-        Cada item já nasce preparado para alimentar o dashboard, a busca por código
-        e as entradas e saídas operacionais.
+        Cada item ja nasce preparado para alimentar o dashboard, a busca por codigo
+        e as entradas e saidas operacionais.
       </p>
     </div>
 
@@ -34,13 +51,40 @@ const data = await getProductCatalogData();
   </section>
 
   <section class="stack-grid">
+    {
+      editingProduct ? (
+        <CreateProductForm
+          client:load
+          disabled={!data.databaseReady}
+          mode="edit"
+          initialValues={{
+            id: editingProduct.id,
+            codigo: editingProduct.codigo,
+            nome: editingProduct.nome,
+            unidadeCompra: editingProduct.unidadeCompra,
+            estoqueMinimo: editingProduct.estoqueMinimo
+          }}
+          successRedirect="/produtos"
+          cancelHref="/produtos"
+          cancelLabel="Encerrar edicao"
+          note={productEditNote}
+        />
+      ) : editNotFound ? (
+        <article class="card">
+          <div class="empty-state">
+            <p>O produto selecionado para edicao nao foi encontrado.</p>
+          </div>
+        </article>
+      ) : null
+    }
+
     <CreateProductForm client:load disabled={!data.databaseReady} />
 
     <article class="card">
       <header class="section-heading">
         <div>
-          <h2>Catálogo atual</h2>
-          <p>Todos os produtos com leitura rápida de estoque e histórico.</p>
+          <h2>Catalogo atual</h2>
+          <p>Todos os produtos com leitura rapida de estoque e historico.</p>
         </div>
       </header>
 
@@ -50,10 +94,11 @@ const data = await getProductCatalogData();
             <table>
               <thead>
                 <tr>
-                  <th>Código</th>
+                  <th>Codigo</th>
                   <th>Produto</th>
                   <th>Saldo atual</th>
                   <th>Status</th>
+                  <th>Acoes</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,13 +119,25 @@ const data = await getProductCatalogData();
                     <td>
                       <strong>{formatQuantity(product.estoqueAtual)}</strong>
                       <div class="muted">{summarizeProductBalance(product)}</div>
-                      <div class="muted">Última entrada: {formatDate(product.lastEntryDate)}</div>
+                      <div class="muted">Ultima entrada: {formatDate(product.lastEntryDate)}</div>
                     </td>
                     <td>
                       <StatusChip
                         label={product.priority.label}
                         tone={product.priority.tone}
                       />
+                    </td>
+                    <td>
+                      <div class="catalog-actions">
+                        <a class="catalog-action-link" href={`/produtos?editar=${product.id}`}>
+                          Editar
+                        </a>
+                        <DeleteRecordButton
+                          client:load
+                          endpoint={`/api/produtos?id=${product.id}`}
+                          resourceLabel={`o produto ${product.codigo}`}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -89,7 +146,7 @@ const data = await getProductCatalogData();
           </div>
         ) : (
           <div class="empty-state">
-            <p>O catálogo aparecerá aqui assim que o primeiro produto for cadastrado.</p>
+            <p>O catalogo aparecera aqui assim que o primeiro produto for cadastrado.</p>
           </div>
         )
       }

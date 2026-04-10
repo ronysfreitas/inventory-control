@@ -24,6 +24,7 @@ import {
   entryInputSchema,
   exitInputSchema,
   productInputSchema,
+  productUpdateSchema,
   supplierInputSchema
 } from './validation';
 
@@ -96,8 +97,21 @@ interface ProductSuggestionRow {
   nome: string;
 }
 
+interface ProductDeleteCheckRow {
+  total_entradas: NumericValue;
+  total_saidas: NumericValue;
+}
+
+interface SupplierDeleteCheckRow {
+  total_entradas: NumericValue;
+}
+
 function toNumber(value: NumericValue | null | undefined) {
   return Number(value ?? 0);
+}
+
+function createRequestError(message: string, statusCode = 400) {
+  return Object.assign(new Error(message), { statusCode });
 }
 
 function normalizeProducts(rows: ProductQueryRow[]) {
@@ -164,6 +178,38 @@ async function getProductsWithPriority() {
   );
 
   return normalizeProducts(rows);
+}
+
+async function getProductRowById(productId: number) {
+  const rows = await query<ProductQueryRow>(
+    `
+      SELECT
+        p.id,
+        p.codigo,
+        p.nome,
+        p.unidade_compra,
+        p.estoque_minimo,
+        p.estoque_atual,
+        p.created_at::text,
+        p.updated_at::text,
+        (
+          SELECT MAX(e.data_movimentacao)::text
+          FROM entradas e
+          WHERE e.produto_id = p.id
+        ) AS ultima_entrada,
+        (
+          SELECT MAX(s.data_movimentacao)::text
+          FROM saidas s
+          WHERE s.produto_id = p.id
+        ) AS ultima_saida
+      FROM produtos p
+      WHERE p.id = $1
+      LIMIT 1
+    `,
+    [productId]
+  );
+
+  return rows[0] ?? null;
 }
 
 async function getDashboardMovementSeries() {
@@ -368,6 +414,20 @@ export async function getProductCatalogData(): Promise<ProductCatalogData> {
   };
 }
 
+export async function getProductForEditing(productId: number) {
+  if (!isDatabaseConfigured()) {
+    return null;
+  }
+
+  const row = await getProductRowById(productId);
+
+  if (!row) {
+    return null;
+  }
+
+  return normalizeProducts([row])[0] ?? null;
+}
+
 export async function searchProductSuggestions(
   rawTerm: string
 ): Promise<ProductSuggestion[]> {
@@ -443,6 +503,45 @@ export async function getSupplierCatalogData(): Promise<SupplierCatalogData> {
       email: row.email,
       totalEntradas: toNumber(row.total_entradas)
     }))
+  };
+}
+
+export async function getSupplierForEditing(supplierId: number) {
+  if (!isDatabaseConfigured()) {
+    return null;
+  }
+
+  const rows = await query<SupplierQueryRow>(
+    `
+      SELECT
+        f.id,
+        f.nome,
+        f.contato1,
+        f.contato2,
+        f.email,
+        COUNT(e.id) AS total_entradas
+      FROM fornecedores f
+      LEFT JOIN entradas e ON e.fornecedor_id = f.id
+      WHERE f.id = $1
+      GROUP BY f.id
+      LIMIT 1
+    `,
+    [supplierId]
+  );
+
+  const row = rows[0];
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: toNumber(row.id),
+    nome: row.nome,
+    contato1: row.contato1,
+    contato2: row.contato2,
+    email: row.email,
+    totalEntradas: toNumber(row.total_entradas)
   };
 }
 
@@ -704,6 +803,87 @@ export async function createProduct(payload: unknown) {
   };
 }
 
+export async function updateProduct(productId: number, payload: unknown) {
+  const input = productUpdateSchema.parse(payload);
+
+  const rows = await query<{ id: NumericValue; codigo: string }>(
+    `
+      UPDATE produtos
+      SET
+        codigo = $2,
+        nome = $3,
+        unidade_compra = $4,
+        estoque_minimo = $5
+      WHERE id = $1
+      RETURNING id, codigo
+    `,
+    [
+      productId,
+      input.codigo,
+      input.nome,
+      input.unidadeCompra,
+      input.estoqueMinimo
+    ]
+  );
+
+  if (!rows[0]) {
+    throw createRequestError('Produto nao encontrado para edicao.', 404);
+  }
+
+  return {
+    id: toNumber(rows[0].id),
+    codigo: rows[0].codigo
+  };
+}
+
+export async function deleteProduct(productId: number) {
+  const checks = await query<ProductDeleteCheckRow>(
+    `
+      SELECT
+        (
+          SELECT COUNT(*)
+          FROM entradas e
+          WHERE e.produto_id = p.id
+        ) AS total_entradas,
+        (
+          SELECT COUNT(*)
+          FROM saidas s
+          WHERE s.produto_id = p.id
+        ) AS total_saidas
+      FROM produtos p
+      WHERE p.id = $1
+      LIMIT 1
+    `,
+    [productId]
+  );
+
+  const product = checks[0];
+
+  if (!product) {
+    throw createRequestError('Produto nao encontrado para exclusao.', 404);
+  }
+
+  if (toNumber(product.total_entradas) > 0 || toNumber(product.total_saidas) > 0) {
+    throw createRequestError(
+      'Este produto nao pode ser excluido porque ja possui entradas ou saidas registradas.',
+      400
+    );
+  }
+
+  const rows = await query<{ id: NumericValue }>(
+    `
+      DELETE FROM produtos
+      WHERE id = $1
+      RETURNING id
+    `,
+    [productId]
+  );
+
+  return {
+    id: toNumber(rows[0]?.id)
+  };
+}
+
 export async function createSupplier(payload: unknown) {
   const input = supplierInputSchema.parse(payload);
 
@@ -729,6 +909,82 @@ export async function createSupplier(payload: unknown) {
   return {
     id: toNumber(rows[0]?.id),
     nome: rows[0]?.nome
+  };
+}
+
+export async function updateSupplier(supplierId: number, payload: unknown) {
+  const input = supplierInputSchema.parse(payload);
+
+  const rows = await query<{ id: NumericValue; nome: string }>(
+    `
+      UPDATE fornecedores
+      SET
+        nome = $2,
+        contato1 = $3,
+        contato2 = $4,
+        email = $5
+      WHERE id = $1
+      RETURNING id, nome
+    `,
+    [
+      supplierId,
+      input.nome,
+      input.contato1 ?? null,
+      input.contato2 ?? null,
+      input.email ?? null
+    ]
+  );
+
+  if (!rows[0]) {
+    throw createRequestError('Fornecedor nao encontrado para edicao.', 404);
+  }
+
+  return {
+    id: toNumber(rows[0].id),
+    nome: rows[0].nome
+  };
+}
+
+export async function deleteSupplier(supplierId: number) {
+  const checks = await query<SupplierDeleteCheckRow>(
+    `
+      SELECT
+        (
+          SELECT COUNT(*)
+          FROM entradas e
+          WHERE e.fornecedor_id = f.id
+        ) AS total_entradas
+      FROM fornecedores f
+      WHERE f.id = $1
+      LIMIT 1
+    `,
+    [supplierId]
+  );
+
+  const supplier = checks[0];
+
+  if (!supplier) {
+    throw createRequestError('Fornecedor nao encontrado para exclusao.', 404);
+  }
+
+  if (toNumber(supplier.total_entradas) > 0) {
+    throw createRequestError(
+      'Este fornecedor nao pode ser excluido porque ja possui entradas registradas.',
+      400
+    );
+  }
+
+  const rows = await query<{ id: NumericValue }>(
+    `
+      DELETE FROM fornecedores
+      WHERE id = $1
+      RETURNING id
+    `,
+    [supplierId]
+  );
+
+  return {
+    id: toNumber(rows[0]?.id)
   };
 }
 

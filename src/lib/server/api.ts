@@ -19,6 +19,16 @@ export function jsonResponse(payload: unknown, status = 200) {
 }
 
 export function resolveErrorStatus(error: unknown) {
+  if (typeof error === 'object' && error && 'statusCode' in error) {
+    const requestError = error as {
+      statusCode?: number;
+    };
+
+    if (typeof requestError.statusCode === 'number') {
+      return requestError.statusCode;
+    }
+  }
+
   if (typeof error === 'object' && error && 'issues' in error) {
     return 400;
   }

@@ -1,7 +1,27 @@
 import { useState } from 'preact/hooks';
 
+type SupplierFormMode = 'create' | 'edit';
+
+interface SupplierFormValues {
+  id?: number;
+  nome?: string;
+  contato1?: string | null;
+  contato2?: string | null;
+  email?: string | null;
+}
+
 interface CreateSupplierFormProps {
   disabled?: boolean;
+  mode?: SupplierFormMode;
+  endpoint?: string;
+  successRedirect?: string;
+  initialValues?: SupplierFormValues;
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+  cancelHref?: string;
+  cancelLabel?: string;
+  note?: string;
 }
 
 interface FeedbackState {
@@ -36,10 +56,44 @@ function normalizeEmail(value: string) {
 }
 
 export default function CreateSupplierForm({
-  disabled = false
+  disabled = false,
+  mode = 'create',
+  endpoint,
+  successRedirect,
+  initialValues,
+  title,
+  description,
+  submitLabel,
+  cancelHref,
+  cancelLabel,
+  note
 }: CreateSupplierFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
+
+  const isEditMode = mode === 'edit';
+  const requestMethod = isEditMode ? 'PUT' : 'POST';
+  const requestUrl =
+    endpoint ??
+    (isEditMode && initialValues?.id
+      ? `/api/fornecedores?id=${initialValues.id}`
+      : '/api/fornecedores');
+
+  const heading = title ?? (isEditMode ? 'Editar fornecedor' : 'Novo fornecedor');
+  const bodyCopy =
+    description ??
+    (isEditMode
+      ? 'Atualize os dados do parceiro sem afetar o historico de entradas.'
+      : 'Cadastre parceiros e mantenha os dados de contato organizados.');
+  const actionLabel =
+    submitLabel ??
+    (isEditMode
+      ? isSubmitting
+        ? 'Salvando...'
+        : 'Salvar alteracoes'
+      : isSubmitting
+        ? 'Salvando...'
+        : 'Salvar fornecedor');
 
   async function handleSubmit(event: Event) {
     event.preventDefault();
@@ -55,8 +109,8 @@ export default function CreateSupplierForm({
 
     try {
       const payload = Object.fromEntries(new FormData(form).entries());
-      const response = await fetch('/api/fornecedores', {
-        method: 'POST',
+      const response = await fetch(requestUrl, {
+        method: requestMethod,
         headers: {
           'Content-Type': 'application/json'
         },
@@ -66,23 +120,35 @@ export default function CreateSupplierForm({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message ?? 'Nao foi possivel cadastrar o fornecedor.');
+        throw new Error(result.message ?? 'Nao foi possivel salvar o fornecedor.');
       }
 
-      form.reset();
       setFeedback({
         type: 'success',
-        message: 'Fornecedor cadastrado com sucesso. Atualizando a lista...'
+        message: isEditMode
+          ? 'Fornecedor atualizado com sucesso. Redirecionando...'
+          : 'Fornecedor cadastrado com sucesso. Atualizando a lista...'
       });
 
-      window.setTimeout(() => window.location.reload(), 700);
+      if (!isEditMode) {
+        form.reset();
+      }
+
+      window.setTimeout(() => {
+        if (successRedirect) {
+          window.location.href = successRedirect;
+          return;
+        }
+
+        window.location.reload();
+      }, 700);
     } catch (error) {
       setFeedback({
         type: 'error',
         message:
           error instanceof Error
             ? error.message
-            : 'Nao foi possivel cadastrar o fornecedor.'
+            : 'Nao foi possivel salvar o fornecedor.'
       });
     } finally {
       setIsSubmitting(false);
@@ -93,15 +159,29 @@ export default function CreateSupplierForm({
     <form class="card async-form" onSubmit={handleSubmit}>
       <header class="card__header">
         <div>
-          <h2>Novo fornecedor</h2>
-          <p>Cadastre parceiros e mantenha os dados de contato organizados.</p>
+          <h2>{heading}</h2>
+          <p>{bodyCopy}</p>
         </div>
+
+        {cancelHref ? (
+          <a href={cancelHref} class="button button--secondary">
+            {cancelLabel ?? 'Cancelar'}
+          </a>
+        ) : null}
       </header>
+
+      {note ? <p class="inline-note">{note}</p> : null}
 
       <div class="form-grid">
         <label class="field field--span-2">
           <span class="field__label">Nome</span>
-          <input name="nome" type="text" disabled={disabled} required />
+          <input
+            name="nome"
+            type="text"
+            defaultValue={initialValues?.nome ?? ''}
+            disabled={disabled}
+            required
+          />
         </label>
 
         <label class="field">
@@ -111,6 +191,7 @@ export default function CreateSupplierForm({
             type="text"
             inputMode="tel"
             placeholder="(31) 99999-0000"
+            defaultValue={initialValues?.contato1 ?? ''}
             disabled={disabled}
             onInput={(event) => {
               const input = event.currentTarget as HTMLInputElement;
@@ -126,6 +207,7 @@ export default function CreateSupplierForm({
             type="text"
             inputMode="tel"
             placeholder="(31) 99999-0000"
+            defaultValue={initialValues?.contato2 ?? ''}
             disabled={disabled}
             onInput={(event) => {
               const input = event.currentTarget as HTMLInputElement;
@@ -141,6 +223,7 @@ export default function CreateSupplierForm({
             type="email"
             inputMode="email"
             placeholder="compras@fornecedor.com"
+            defaultValue={initialValues?.email ?? ''}
             disabled={disabled}
             onInput={(event) => {
               const input = event.currentTarget as HTMLInputElement;
@@ -156,7 +239,7 @@ export default function CreateSupplierForm({
 
       <div class="form-actions">
         <button type="submit" class="button button--primary" disabled={disabled || isSubmitting}>
-          {isSubmitting ? 'Salvando...' : 'Salvar fornecedor'}
+          {actionLabel}
         </button>
       </div>
     </form>

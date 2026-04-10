@@ -1,9 +1,30 @@
 ---
+import '../styles/catalog-management.scss';
+
 import AppLayout from '../layouts/AppLayout.astro';
 import CreateSupplierForm from '../components/CreateSupplierForm.tsx';
-import { getSupplierCatalogData } from '../lib/server/inventory-service';
+import DeleteRecordButton from '../components/DeleteRecordButton.tsx';
+import {
+  getSupplierCatalogData,
+  getSupplierForEditing
+} from '../lib/server/inventory-service';
 
-const data = await getSupplierCatalogData();
+const editParam = Astro.url.searchParams.get('editar');
+const editId = editParam && /^\d+$/.test(editParam) ? Number(editParam) : null;
+
+const [data, editingSupplier] = await Promise.all([
+  getSupplierCatalogData(),
+  editId ? getSupplierForEditing(editId) : Promise.resolve(null)
+]);
+
+const editRequested = Boolean(editParam);
+const editNotFound = editRequested && !editingSupplier && data.databaseReady;
+
+const supplierEditNote = editingSupplier
+  ? editingSupplier.totalEntradas > 0
+    ? `Este fornecedor ja possui ${editingSupplier.totalEntradas} entradas registradas. As alteracoes afetam apenas os dados cadastrais.`
+    : 'Este fornecedor ainda nao possui entradas registradas.'
+  : '';
 ---
 
 <AppLayout
@@ -21,6 +42,33 @@ const data = await getSupplierCatalogData();
   </section>
 
   <section class="stack-grid">
+    {
+      editingSupplier ? (
+        <CreateSupplierForm
+          client:load
+          disabled={!data.databaseReady}
+          mode="edit"
+          initialValues={{
+            id: editingSupplier.id,
+            nome: editingSupplier.nome,
+            contato1: editingSupplier.contato1,
+            contato2: editingSupplier.contato2,
+            email: editingSupplier.email
+          }}
+          successRedirect="/fornecedores"
+          cancelHref="/fornecedores"
+          cancelLabel="Encerrar edicao"
+          note={supplierEditNote}
+        />
+      ) : editNotFound ? (
+        <article class="card">
+          <div class="empty-state">
+            <p>O fornecedor selecionado para edicao nao foi encontrado.</p>
+          </div>
+        </article>
+      ) : null
+    }
+
     <CreateSupplierForm client:load disabled={!data.databaseReady} />
 
     <article class="card">
@@ -41,6 +89,7 @@ const data = await getSupplierCatalogData();
                   <th>Contatos</th>
                   <th>E-mail</th>
                   <th>Historico</th>
+                  <th>Acoes</th>
                 </tr>
               </thead>
               <tbody>
@@ -54,6 +103,21 @@ const data = await getSupplierCatalogData();
                     <td>{supplier.email ?? 'Sem e-mail informado'}</td>
                     <td>
                       <div>{supplier.totalEntradas} entradas registradas</div>
+                    </td>
+                    <td>
+                      <div class="catalog-actions">
+                        <a
+                          class="catalog-action-link"
+                          href={`/fornecedores?editar=${supplier.id}`}
+                        >
+                          Editar
+                        </a>
+                        <DeleteRecordButton
+                          client:load
+                          endpoint={`/api/fornecedores?id=${supplier.id}`}
+                          resourceLabel={`o fornecedor ${supplier.nome}`}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

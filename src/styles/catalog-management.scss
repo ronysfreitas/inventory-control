@@ -1,0 +1,50 @@
+.button--secondary {
+  border: 1px solid rgba(69, 49, 29, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.button--secondary:hover {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.button--danger {
+  color: #8f2c2c;
+  background: rgba(199, 60, 47, 0.12);
+  border-color: rgba(199, 60, 47, 0.22);
+}
+
+.button--danger:hover {
+  background: rgba(199, 60, 47, 0.18);
+}
+
+.catalog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.catalog-action-link {
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.table-actions {
+  display: grid;
+  gap: 0.35rem;
+  align-items: start;
+}
+
+.table-actions__feedback {
+  font-size: 0.84rem;
+}
+
+.table-actions__feedback--success {
+  color: #0d5f3b;
+}
+
+.table-actions__feedback--error {
+  color: #8f2c2c;
+}
