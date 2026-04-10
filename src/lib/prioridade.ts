@@ -2,52 +2,56 @@ import type { ProductPriority } from './types';
 
 export function evaluatePurchasePriority(
   estoqueAtual: number,
-  estoqueMinimo: number
+  estoqueMinimo: number,
+  estoqueRegular: number
 ): ProductPriority {
-  if (estoqueMinimo <= 0) {
+  const target = Math.max(estoqueRegular, estoqueMinimo);
+
+  if (target <= 0) {
     return {
       label: 'Baixa',
       tone: 'low',
       score: 0,
       gap: 0,
       coverage: null,
-      reason: 'Sem estoque mínimo configurado para este produto.'
+      reason: 'Sem estoque minimo e regular configurados para este produto.'
     };
   }
 
-  const gap = estoqueMinimo - estoqueAtual;
-  const coverage = estoqueAtual / estoqueMinimo;
+  const gapToMin = estoqueMinimo - estoqueAtual;
+  const gapToRegular = target - estoqueAtual;
+  const coverage = estoqueAtual / target;
 
-  if (estoqueAtual <= 0) {
+  if (estoqueAtual <= estoqueMinimo) {
     return {
       label: 'Crítica',
       tone: 'critical',
-      score: 140 + Math.max(gap, 0) * 3,
-      gap,
-      coverage: 0,
-      reason: 'Sem saldo disponível. Reposição imediata recomendada.'
+      score: 140 + Math.max(gapToMin, 0) * 3,
+      gap: gapToMin,
+      coverage,
+      reason: 'No limite minimo ou abaixo. Reposicao imediata recomendada.'
     };
   }
 
-  if (coverage < 0.5) {
+  if (estoqueAtual < target) {
     return {
       label: 'Alta',
       tone: 'high',
-      score: 95 + Math.max(gap, 0) * 2,
-      gap,
+      score: 95 + Math.max(gapToRegular, 0) * 2,
+      gap: gapToRegular,
       coverage,
-      reason: 'Cobertura abaixo de 50% do estoque mínimo.'
+      reason: 'Abaixo do estoque regular. Compra recomendada para reposicao.'
     };
   }
 
-  if (coverage < 1) {
+  if (coverage < 1.3) {
     return {
       label: 'Moderada',
       tone: 'medium',
-      score: 60 + Math.max(gap, 0),
-      gap,
+      score: 60 + (1.3 - coverage) * 25,
+      gap: gapToRegular,
       coverage,
-      reason: 'Abaixo do estoque mínimo, mas ainda com saldo operacional.'
+      reason: 'Acima do regular, mas com folga curta de estoque.'
     };
   }
 
@@ -55,8 +59,9 @@ export function evaluatePurchasePriority(
     label: 'Baixa',
     tone: 'low',
     score: Math.max(0, 20 - coverage * 4),
-    gap,
+    gap: gapToRegular,
     coverage,
-    reason: 'Estoque acima do mínimo configurado.'
+    reason: 'Estoque confortavel acima do nivel regular.'
   };
 }
+

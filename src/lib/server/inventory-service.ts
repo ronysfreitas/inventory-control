@@ -36,6 +36,7 @@ interface ProductQueryRow {
   nome: string;
   unidade_compra: string;
   estoque_minimo: NumericValue;
+  estoque_regular: NumericValue;
   estoque_atual: NumericValue;
   created_at: string;
   updated_at: string;
@@ -122,6 +123,7 @@ function normalizeProducts(rows: ProductQueryRow[]) {
       nome: row.nome,
       unidadeCompra: row.unidade_compra,
       estoqueMinimo: toNumber(row.estoque_minimo),
+      estoqueRegular: toNumber(row.estoque_regular),
       estoqueAtual: toNumber(row.estoque_atual),
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -129,7 +131,8 @@ function normalizeProducts(rows: ProductQueryRow[]) {
       lastExitDate: row.ultima_saida,
       priority: evaluatePurchasePriority(
         toNumber(row.estoque_atual),
-        toNumber(row.estoque_minimo)
+        toNumber(row.estoque_minimo),
+        toNumber(row.estoque_regular)
       )
     }))
     .sort((left, right) => {
@@ -159,6 +162,7 @@ async function getProductsWithPriority() {
         p.nome,
         p.unidade_compra,
         p.estoque_minimo,
+        p.estoque_regular,
         p.estoque_atual,
         p.created_at::text,
         p.updated_at::text,
@@ -189,6 +193,7 @@ async function getProductRowById(productId: number) {
         p.nome,
         p.unidade_compra,
         p.estoque_minimo,
+        p.estoque_regular,
         p.estoque_atual,
         p.created_at::text,
         p.updated_at::text,
@@ -589,6 +594,7 @@ export async function getProductDetailsData(
         p.nome,
         p.unidade_compra,
         p.estoque_minimo,
+        p.estoque_regular,
         p.estoque_atual,
         p.created_at::text,
         p.updated_at::text,
@@ -783,9 +789,10 @@ export async function createProduct(payload: unknown) {
         nome,
         unidade_compra,
         estoque_minimo,
+        estoque_regular,
         estoque_atual
       )
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id, codigo
     `,
     [
@@ -793,6 +800,7 @@ export async function createProduct(payload: unknown) {
       input.nome,
       input.unidadeCompra,
       input.estoqueMinimo,
+      input.estoqueRegular,
       input.estoqueInicial
     ]
   );
@@ -813,7 +821,8 @@ export async function updateProduct(productId: number, payload: unknown) {
         codigo = $2,
         nome = $3,
         unidade_compra = $4,
-        estoque_minimo = $5
+        estoque_minimo = $5,
+        estoque_regular = $6
       WHERE id = $1
       RETURNING id, codigo
     `,
@@ -822,7 +831,8 @@ export async function updateProduct(productId: number, payload: unknown) {
       input.codigo,
       input.nome,
       input.unidadeCompra,
-      input.estoqueMinimo
+      input.estoqueMinimo,
+      input.estoqueRegular
     ]
   );
 
@@ -1085,9 +1095,9 @@ export function getFriendlyError(error: unknown) {
 }
 
 export function summarizeProductBalance(product: ProductWithPriority) {
-  return `${formatQuantity(product.estoqueAtual)} em estoque, mínimo ${formatQuantity(
+  return `${formatQuantity(product.estoqueAtual)} em estoque, minimo ${formatQuantity(
     product.estoqueMinimo
-  )}.`;
+  )} e regular ${formatQuantity(product.estoqueRegular)}.`;
 }
 
 export function summarizeFinancialImpact(entries: EntryRecord[]) {

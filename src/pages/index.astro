@@ -1,6 +1,5 @@
 ---
 import AppLayout from '../layouts/AppLayout.astro';
-import ChartCard from '../components/ChartCard.tsx';
 import CodeSearchForm from '../components/CodeSearchForm.tsx';
 import StatusChip from '../components/StatusChip.astro';
 import { formatDate, formatQuantity } from '../lib/formatters';
@@ -10,118 +9,26 @@ import {
 } from '../lib/server/inventory-service';
 
 const dashboard = await getDashboardData();
-
-const statusConfig = {
-  type: 'doughnut',
-  data: {
-    labels: dashboard.statusSummary.map((item) => item.label),
-    datasets: [
-      {
-        data: dashboard.statusSummary.map((item) => item.total),
-        backgroundColor: ['#c73c2f', '#d97a0d', '#bea039', '#1d7b58'],
-        borderWidth: 0
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom'
-      }
-    }
-  }
-};
-
-const movementConfig = {
-  type: 'bar',
-  data: {
-    labels: dashboard.movementSeries.map((item) =>
-      item.day.slice(5).split('-').reverse().join('/')
-    ),
-    datasets: [
-      {
-        label: 'Entradas',
-        data: dashboard.movementSeries.map((item) => item.entradas),
-        backgroundColor: '#0f6165',
-        borderRadius: 8
-      },
-      {
-        label: 'Saídas',
-        data: dashboard.movementSeries.map((item) => item.saidas),
-        backgroundColor: '#b35e2e',
-        borderRadius: 8
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom'
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    }
-  }
-};
-
-const supplierConfig = {
-  type: 'bar',
-  data: {
-    labels: dashboard.supplierRanking.map((item) => item.nome),
-    datasets: [
-      {
-        label: 'Quantidade total',
-        data: dashboard.supplierRanking.map((item) => item.totalQuantidade),
-        backgroundColor: '#0f6165',
-        borderRadius: 8
-      }
-    ]
-  },
-  options: {
-    indexAxis: 'y',
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false
-      }
-    },
-    scales: {
-      x: {
-        beginAtZero: true
-      }
-    }
-  }
-};
 ---
 
 <AppLayout
   title="Dashboard de estoque"
-  description="Prioridade de compra, busca por código e leitura operacional do estoque."
+  description="Prioridade de compra, busca por codigo e leitura operacional do estoque."
   currentPath="/"
   databaseReady={dashboard.databaseReady}
 >
   <section class="hero-panel hero-grid">
     <div>
-      <span class="eyebrow">Operação e reposição</span>
-      <h1>Estoque com prioridade de compra clara e consulta rápida por código.</h1>
+      <span class="eyebrow">Operacao e reposicao</span>
+      <h1>Dashboard | Controle de Estoque</h1>
       <p class="body-copy">
         O painel destaca o que precisa de compra primeiro, mostra o fluxo recente
-        de entradas e saídas e acelera a consulta do item para movimentação.
+        de entradas e saidas e acelera a consulta do item para movimentacao.
       </p>
-
     </div>
 
     <div class="hero-actions">
       <CodeSearchForm client:load />
-      <div class="quick-links">
-        <a href="/produtos" class="quick-link">Cadastrar produto</a>
-        <a href="/fornecedores" class="quick-link">Cadastrar fornecedor</a>
-      </div>
     </div>
   </section>
 
@@ -130,7 +37,7 @@ const supplierConfig = {
       <header class="section-heading">
         <div>
           <h2>Fila de compra por prioridade</h2>
-          <p>Itens ordenados do mais urgente ao mais estável.</p>
+          <p>Itens ordenados do mais urgente ao mais estavel.</p>
         </div>
       </header>
 
@@ -143,7 +50,7 @@ const supplierConfig = {
                   <th>Produto</th>
                   <th>Status</th>
                   <th>Estoque</th>
-                  <th>Últimas movimentações</th>
+                  <th>Ultimas movimentacoes</th>
                 </tr>
               </thead>
               <tbody>
@@ -171,7 +78,7 @@ const supplierConfig = {
                     </td>
                     <td>
                       <div>Entrada: {formatDate(product.lastEntryDate)}</div>
-                      <div>Saída: {formatDate(product.lastExitDate)}</div>
+                      <div>Saida: {formatDate(product.lastExitDate)}</div>
                     </td>
                   </tr>
                 ))}
@@ -185,24 +92,6 @@ const supplierConfig = {
         )
       }
     </article>
-
-    <div class="stack-grid">
-      <ChartCard
-        client:load
-        title="Distribuição de prioridades"
-        description="Leitura rápida do risco de ruptura no estoque."
-        config={statusConfig}
-        hasData={dashboard.statusSummary.some((item) => item.total > 0)}
-      />
-
-      <ChartCard
-        client:load
-        title="Entradas x saídas em 30 dias"
-        description="Volume diário de movimentações recentes."
-        config={movementConfig}
-        hasData={dashboard.movementSeries.length > 0}
-      />
-    </div>
   </section>
 
   <section class="stack-grid">
@@ -210,7 +99,7 @@ const supplierConfig = {
       <header class="section-heading">
         <div>
           <h2>Resumo dos fornecedores mais ativos</h2>
-          <p>Ranking por quantidade total entregue no último ano.</p>
+          <p>Ranking por quantidade total entregue no ultimo ano.</p>
         </div>
       </header>
 
@@ -238,18 +127,10 @@ const supplierConfig = {
           </div>
         ) : (
           <div class="empty-state">
-            <p>As entradas registradas no ano vão alimentar este ranking automaticamente.</p>
+            <p>As entradas registradas no ano vao alimentar este ranking automaticamente.</p>
           </div>
         )
       }
     </article>
-
-    <ChartCard
-      client:load
-      title="Volume por fornecedor"
-      description="Quem mais abasteceu o estoque no período de 12 meses."
-      config={supplierConfig}
-      hasData={dashboard.supplierRanking.length > 0}
-    />
   </section>
 </AppLayout>

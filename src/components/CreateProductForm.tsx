@@ -8,6 +8,7 @@ interface ProductFormValues {
   nome?: string;
   unidadeCompra?: string;
   estoqueMinimo?: number;
+  estoqueRegular?: number;
   estoqueInicial?: number;
 }
 
@@ -148,12 +149,12 @@ export default function CreateProductForm({
       {note ? <p class="inline-note">{note}</p> : null}
 
       <div class="form-grid">
-        <label class="field">
+        <label class="field field--span-2">
           <span class="field__label">Codigo do produto</span>
           <input
             name="codigo"
             type="text"
-            placeholder="CIMENTO-001"
+            placeholder="COD123456"
             defaultValue={initialValues?.codigo ?? ''}
             disabled={disabled}
             required
@@ -165,7 +166,7 @@ export default function CreateProductForm({
           <input
             name="nome"
             type="text"
-            placeholder="Cimento CP-II 50kg"
+            placeholder="XYZ <especificação>"
             defaultValue={initialValues?.nome ?? ''}
             disabled={disabled}
             required
@@ -177,7 +178,7 @@ export default function CreateProductForm({
           <input
             name="unidadeCompra"
             type="text"
-            placeholder="saco, caixa, rolo..."
+            placeholder="Unidade, litro, saco, caixa, rolo..."
             defaultValue={initialValues?.unidadeCompra ?? ''}
             disabled={disabled}
             required
@@ -192,6 +193,19 @@ export default function CreateProductForm({
             min="0"
             step="0.01"
             defaultValue={initialValues?.estoqueMinimo ?? 0}
+            disabled={disabled}
+            required
+          />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Estoque regular</span>
+          <input
+            name="estoqueRegular"
+            type="number"
+            min="0"
+            step="0.01"
+            defaultValue={initialValues?.estoqueRegular ?? 0}
             disabled={disabled}
             required
           />

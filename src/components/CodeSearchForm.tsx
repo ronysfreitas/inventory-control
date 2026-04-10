@@ -185,7 +185,7 @@ export default function CodeSearchForm({
                   setActiveIndex(-1);
                 }
               }}
-              placeholder="Ex.: CIMENTO-001"
+              placeholder="Ex.: COD123456"
               autoComplete="off"
               aria-autocomplete="list"
               aria-controls={suggestionsIdRef.current}

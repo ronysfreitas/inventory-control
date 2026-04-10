@@ -14,10 +14,29 @@ CREATE TABLE IF NOT EXISTS produtos (
   nome VARCHAR(180) NOT NULL,
   unidade_compra VARCHAR(40) NOT NULL,
   estoque_minimo NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (estoque_minimo >= 0),
+  estoque_regular NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (estoque_regular >= 0),
   estoque_atual NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (estoque_atual >= 0),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT produtos_regular_maior_igual_minimo_chk CHECK (
+    estoque_regular >= estoque_minimo
+  )
 );
+
+ALTER TABLE produtos
+  ADD COLUMN IF NOT EXISTS estoque_regular NUMERIC(12, 2) NOT NULL DEFAULT 0;
+
+UPDATE produtos
+SET estoque_regular = estoque_minimo
+WHERE estoque_regular < estoque_minimo;
+
+ALTER TABLE produtos
+  DROP CONSTRAINT IF EXISTS produtos_regular_maior_igual_minimo_chk;
+
+ALTER TABLE produtos
+  ADD CONSTRAINT produtos_regular_maior_igual_minimo_chk CHECK (
+    estoque_regular >= estoque_minimo
+  );
 
 CREATE TABLE IF NOT EXISTS fornecedores (
   id BIGSERIAL PRIMARY KEY,
@@ -208,11 +227,13 @@ SELECT
   p.unidade_compra,
   p.estoque_minimo,
   p.estoque_atual,
+  p.estoque_regular,
   CASE
-    WHEN p.estoque_minimo <= 0 THEN 'Baixa'
-    WHEN p.estoque_atual <= 0 THEN 'Crítica'
-    WHEN p.estoque_atual < (p.estoque_minimo * 0.5) THEN 'Alta'
-    WHEN p.estoque_atual < p.estoque_minimo THEN 'Moderada'
+    WHEN p.estoque_regular <= 0 THEN 'Baixa'
+    WHEN p.estoque_atual <= p.estoque_minimo THEN 'Crítica'
+    WHEN p.estoque_atual < p.estoque_regular THEN 'Alta'
+    WHEN p.estoque_atual < (p.estoque_regular * 1.3) THEN 'Moderada'
     ELSE 'Baixa'
   END AS prioridade_compra
 FROM produtos p;
+

@@ -110,6 +110,12 @@ const stockConfig = {
         data: [product?.estoqueMinimo ?? 0],
         backgroundColor: '#d97a0d',
         borderRadius: 8
+      },
+      {
+        label: 'Estoque regular',
+        data: [product?.estoqueRegular ?? 0],
+        backgroundColor: '#bea039',
+        borderRadius: 8
       }
     ]
   },
@@ -156,6 +162,9 @@ const stockConfig = {
                 <span class="meta-pill">
                   Cobertura atual: {formatCoverage(product.priority.coverage)}
                 </span>
+                <span class="meta-pill">
+                  Estoque regular: {formatQuantity(product.estoqueRegular)}
+                </span>
                 <span class="meta-pill">Última entrada: {formatDate(product.lastEntryDate)}</span>
                 <span class="meta-pill">Última saída: {formatDate(product.lastExitDate)}</span>
               </div>
@@ -171,7 +180,7 @@ const stockConfig = {
           <MetricCard
             label="Estoque atual"
             value={formatQuantity(product.estoqueAtual)}
-            detail={`Estoque mínimo definido em ${formatQuantity(product.estoqueMinimo)}.`}
+            detail={`Minimo ${formatQuantity(product.estoqueMinimo)} e regular ${formatQuantity(product.estoqueRegular)}.`}
             tone={product.priority.tone}
           />
           <MetricCard
@@ -224,8 +233,8 @@ const stockConfig = {
 
           <ChartCard
             client:load
-            title="Estoque atual comparado ao mínimo"
-            description="Leitura objetiva da folga de estoque."
+            title="Estoque atual comparado aos niveis"
+            description="Leitura objetiva frente ao minimo e ao regular."
             config={stockConfig}
             hasData={true}
           />
@@ -386,3 +395,4 @@ const stockConfig = {
     )
   }
 </AppLayout>
+

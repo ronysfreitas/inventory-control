@@ -214,6 +214,7 @@ code {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  margin-bottom: 16px;
 }
 
 .hero-panel h1,
@@ -248,14 +249,8 @@ code {
   gap: 0.9rem;
 }
 
-.quick-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-}
 
-.button,
-.quick-link {
+.button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -267,15 +262,13 @@ code {
   transition: 160ms ease;
 }
 
-.button--primary,
-.quick-link {
+.button--primary {
   color: white;
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   box-shadow: 0 16px 28px rgba(15, 97, 101, 0.18);
 }
 
-.button--primary:hover,
-.quick-link:hover {
+.button--primary:hover {
   transform: translateY(-1px);
 }
 

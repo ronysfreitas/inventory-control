@@ -29,7 +29,7 @@ const showEditModal = Boolean(editingProduct);
 const showCreateModal = createRequested && !showEditModal;
 
 const productEditNote = editingProduct
-  ? `Estoque atual: ${formatQuantity(editingProduct.estoqueAtual)}. Ultima entrada: ${formatDate(editingProduct.lastEntryDate)}. Ultima saida: ${formatDate(editingProduct.lastExitDate)}. O saldo continua sendo atualizado por entradas e saidas.`
+  ? `Estoque atual: ${formatQuantity(editingProduct.estoqueAtual)}. Minimo: ${formatQuantity(editingProduct.estoqueMinimo)}. Regular: ${formatQuantity(editingProduct.estoqueRegular)}. Ultima entrada: ${formatDate(editingProduct.lastEntryDate)}. Ultima saida: ${formatDate(editingProduct.lastExitDate)}. O saldo continua sendo atualizado por entradas e saidas.`
   : '';
 ---
 
@@ -42,7 +42,7 @@ const productEditNote = editingProduct
   <section class="hero-panel hero-grid">
     <div>
       <span class="eyebrow">Cadastro principal</span>
-      <h1>Produtos com saldo, minimo e prioridade de reposicao no mesmo fluxo.</h1>
+      <h1>Produtos | Cadastro e atualizações</h1>
       <p class="body-copy">
         Cada item ja nasce preparado para alimentar o dashboard, a busca por codigo
         e as entradas e saidas operacionais.
@@ -146,7 +146,8 @@ const productEditNote = editingProduct
                 codigo: editingProduct?.codigo,
                 nome: editingProduct?.nome,
                 unidadeCompra: editingProduct?.unidadeCompra,
-                estoqueMinimo: editingProduct?.estoqueMinimo
+                estoqueMinimo: editingProduct?.estoqueMinimo,
+                estoqueRegular: editingProduct?.estoqueRegular
               }}
               successRedirect="/produtos"
               cancelHref="/produtos"

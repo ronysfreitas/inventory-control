@@ -7,6 +7,7 @@ export interface ProductBase {
   nome: string;
   unidadeCompra: string;
   estoqueMinimo: number;
+  estoqueRegular: number;
   estoqueAtual: number;
   createdAt: string;
   updatedAt: string;

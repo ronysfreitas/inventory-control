@@ -17,7 +17,7 @@ const emailInput = z
     message: 'Informe um e-mail valido.'
   });
 
-export const productInputSchema = z.object({
+const productBaseSchema = z.object({
   codigo: z
     .string()
     .trim()
@@ -37,14 +37,34 @@ export const productInputSchema = z.object({
   estoqueMinimo: numericInput.nonnegative(
     'O estoque minimo nao pode ser negativo.'
   ),
+  estoqueRegular: numericInput.nonnegative(
+    'O estoque regular nao pode ser negativo.'
+  ),
   estoqueInicial: numericInput.nonnegative(
     'O estoque inicial nao pode ser negativo.'
   )
 });
 
-export const productUpdateSchema = productInputSchema.omit({
-  estoqueInicial: true
-});
+function validateRegularStock(
+  value: { estoqueMinimo: number; estoqueRegular: number },
+  context: z.RefinementCtx
+) {
+  if (value.estoqueRegular < value.estoqueMinimo) {
+    context.addIssue({
+      code: 'custom',
+      path: ['estoqueRegular'],
+      message: 'O estoque regular deve ser maior ou igual ao estoque minimo.'
+    });
+  }
+}
+
+export const productInputSchema = productBaseSchema.superRefine(validateRegularStock);
+
+export const productUpdateSchema = productBaseSchema
+  .omit({
+    estoqueInicial: true
+  })
+  .superRefine(validateRegularStock);
 
 export const supplierInputSchema = z.object({
   nome: z
