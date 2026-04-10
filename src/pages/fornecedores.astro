@@ -9,8 +9,10 @@ import {
   getSupplierForEditing
 } from '../lib/server/inventory-service';
 
+const createParam = Astro.url.searchParams.get('novo');
 const editParam = Astro.url.searchParams.get('editar');
 const editId = editParam && /^\d+$/.test(editParam) ? Number(editParam) : null;
+const createRequested = createParam === '1';
 
 const [data, editingSupplier] = await Promise.all([
   getSupplierCatalogData(),
@@ -19,6 +21,8 @@ const [data, editingSupplier] = await Promise.all([
 
 const editRequested = Boolean(editParam);
 const editNotFound = editRequested && !editingSupplier && data.databaseReady;
+const showEditModal = Boolean(editingSupplier);
+const showCreateModal = createRequested && !showEditModal;
 
 const supplierEditNote = editingSupplier
   ? editingSupplier.totalEntradas > 0
@@ -42,41 +46,16 @@ const supplierEditNote = editingSupplier
   </section>
 
   <section class="stack-grid">
-    {
-      editingSupplier ? (
-        <CreateSupplierForm
-          client:load
-          disabled={!data.databaseReady}
-          mode="edit"
-          initialValues={{
-            id: editingSupplier.id,
-            nome: editingSupplier.nome,
-            contato1: editingSupplier.contato1,
-            contato2: editingSupplier.contato2,
-            email: editingSupplier.email
-          }}
-          successRedirect="/fornecedores"
-          cancelHref="/fornecedores"
-          cancelLabel="Encerrar edicao"
-          note={supplierEditNote}
-        />
-      ) : editNotFound ? (
-        <article class="card">
-          <div class="empty-state">
-            <p>O fornecedor selecionado para edicao nao foi encontrado.</p>
-          </div>
-        </article>
-      ) : null
-    }
-
-    <CreateSupplierForm client:load disabled={!data.databaseReady} />
-
     <article class="card">
       <header class="section-heading">
         <div>
           <h2>Fornecedores cadastrados</h2>
           <p>Contatos, e-mails e historico de entradas por fornecedor.</p>
         </div>
+
+        <a class="button button--primary" href="/fornecedores?novo=1">
+          Incluir fornecedor
+        </a>
       </header>
 
       {
@@ -132,4 +111,59 @@ const supplierEditNote = editingSupplier
       }
     </article>
   </section>
+
+  {
+    showEditModal ? (
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Editar fornecedor">
+        <div class="catalog-modal__backdrop">
+          <div class="catalog-modal__panel">
+            <CreateSupplierForm
+              client:load
+              disabled={!data.databaseReady}
+              mode="edit"
+              initialValues={{
+                id: editingSupplier?.id,
+                nome: editingSupplier?.nome,
+                contato1: editingSupplier?.contato1,
+                contato2: editingSupplier?.contato2,
+                email: editingSupplier?.email
+              }}
+              successRedirect="/fornecedores"
+              cancelHref="/fornecedores"
+              cancelLabel="Fechar"
+              note={supplierEditNote}
+            />
+          </div>
+        </div>
+      </div>
+    ) : showCreateModal ? (
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Novo fornecedor">
+        <div class="catalog-modal__backdrop">
+          <div class="catalog-modal__panel">
+            <CreateSupplierForm
+              client:load
+              disabled={!data.databaseReady}
+              successRedirect="/fornecedores"
+              cancelHref="/fornecedores"
+              cancelLabel="Fechar"
+            />
+          </div>
+        </div>
+      </div>
+    ) : editNotFound ? (
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Fornecedor nao encontrado">
+        <div class="catalog-modal__backdrop">
+          <article class="catalog-modal__panel card">
+            <div class="card__header">
+              <div>
+                <h2>Fornecedor nao encontrado</h2>
+                <p>O registro selecionado para edicao nao esta mais disponivel.</p>
+              </div>
+              <a href="/fornecedores" class="button button--secondary">Fechar</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    ) : null
+  }
 </AppLayout>

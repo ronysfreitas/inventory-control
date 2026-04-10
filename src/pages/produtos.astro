@@ -13,8 +13,10 @@ import {
   summarizeProductBalance
 } from '../lib/server/inventory-service';
 
+const createParam = Astro.url.searchParams.get('novo');
 const editParam = Astro.url.searchParams.get('editar');
 const editId = editParam && /^\d+$/.test(editParam) ? Number(editParam) : null;
+const createRequested = createParam === '1';
 
 const [data, editingProduct] = await Promise.all([
   getProductCatalogData(),
@@ -23,6 +25,8 @@ const [data, editingProduct] = await Promise.all([
 
 const editRequested = Boolean(editParam);
 const editNotFound = editRequested && !editingProduct && data.databaseReady;
+const showEditModal = Boolean(editingProduct);
+const showCreateModal = createRequested && !showEditModal;
 
 const productEditNote = editingProduct
   ? `Estoque atual: ${formatQuantity(editingProduct.estoqueAtual)}. Ultima entrada: ${formatDate(editingProduct.lastEntryDate)}. Ultima saida: ${formatDate(editingProduct.lastExitDate)}. O saldo continua sendo atualizado por entradas e saidas.`
@@ -51,41 +55,16 @@ const productEditNote = editingProduct
   </section>
 
   <section class="stack-grid">
-    {
-      editingProduct ? (
-        <CreateProductForm
-          client:load
-          disabled={!data.databaseReady}
-          mode="edit"
-          initialValues={{
-            id: editingProduct.id,
-            codigo: editingProduct.codigo,
-            nome: editingProduct.nome,
-            unidadeCompra: editingProduct.unidadeCompra,
-            estoqueMinimo: editingProduct.estoqueMinimo
-          }}
-          successRedirect="/produtos"
-          cancelHref="/produtos"
-          cancelLabel="Encerrar edicao"
-          note={productEditNote}
-        />
-      ) : editNotFound ? (
-        <article class="card">
-          <div class="empty-state">
-            <p>O produto selecionado para edicao nao foi encontrado.</p>
-          </div>
-        </article>
-      ) : null
-    }
-
-    <CreateProductForm client:load disabled={!data.databaseReady} />
-
     <article class="card">
       <header class="section-heading">
         <div>
           <h2>Catalogo atual</h2>
           <p>Todos os produtos com leitura rapida de estoque e historico.</p>
         </div>
+
+        <a class="button button--primary" href="/produtos?novo=1">
+          Incluir produto
+        </a>
       </header>
 
       {
@@ -152,4 +131,59 @@ const productEditNote = editingProduct
       }
     </article>
   </section>
+
+  {
+    showEditModal ? (
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Editar produto">
+        <div class="catalog-modal__backdrop">
+          <div class="catalog-modal__panel">
+            <CreateProductForm
+              client:load
+              disabled={!data.databaseReady}
+              mode="edit"
+              initialValues={{
+                id: editingProduct?.id,
+                codigo: editingProduct?.codigo,
+                nome: editingProduct?.nome,
+                unidadeCompra: editingProduct?.unidadeCompra,
+                estoqueMinimo: editingProduct?.estoqueMinimo
+              }}
+              successRedirect="/produtos"
+              cancelHref="/produtos"
+              cancelLabel="Fechar"
+              note={productEditNote}
+            />
+          </div>
+        </div>
+      </div>
+    ) : showCreateModal ? (
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Novo produto">
+        <div class="catalog-modal__backdrop">
+          <div class="catalog-modal__panel">
+            <CreateProductForm
+              client:load
+              disabled={!data.databaseReady}
+              successRedirect="/produtos"
+              cancelHref="/produtos"
+              cancelLabel="Fechar"
+            />
+          </div>
+        </div>
+      </div>
+    ) : editNotFound ? (
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Produto nao encontrado">
+        <div class="catalog-modal__backdrop">
+          <article class="catalog-modal__panel card">
+            <div class="card__header">
+              <div>
+                <h2>Produto nao encontrado</h2>
+                <p>O registro selecionado para edicao nao esta mais disponivel.</p>
+              </div>
+              <a href="/produtos" class="button button--secondary">Fechar</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    ) : null
+  }
 </AppLayout>
