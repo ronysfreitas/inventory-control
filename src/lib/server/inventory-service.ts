@@ -45,11 +45,10 @@ interface ProductQueryRow {
 interface SupplierQueryRow {
   id: NumericValue;
   nome: string;
-  contato1: string;
+  contato1: string | null;
   contato2: string | null;
   email: string | null;
   total_entradas: NumericValue | null;
-  volume_anual: NumericValue | null;
 }
 
 interface SupplierRankingRow {
@@ -426,16 +425,7 @@ export async function getSupplierCatalogData(): Promise<SupplierCatalogData> {
         f.contato1,
         f.contato2,
         f.email,
-        COUNT(e.id) AS total_entradas,
-        COALESCE(
-          SUM(
-            CASE
-              WHEN e.data_movimentacao >= CURRENT_DATE - INTERVAL '365 days' THEN e.quantidade
-              ELSE 0
-            END
-          ),
-          0
-        ) AS volume_anual
+        COUNT(e.id) AS total_entradas
       FROM fornecedores f
       LEFT JOIN entradas e ON e.fornecedor_id = f.id
       GROUP BY f.id
@@ -451,8 +441,7 @@ export async function getSupplierCatalogData(): Promise<SupplierCatalogData> {
       contato1: row.contato1,
       contato2: row.contato2,
       email: row.email,
-      totalEntradas: toNumber(row.total_entradas),
-      volumeAnual: toNumber(row.volume_anual)
+      totalEntradas: toNumber(row.total_entradas)
     }))
   };
 }
@@ -466,8 +455,7 @@ async function getAllSuppliersOptions() {
         f.contato1,
         f.contato2,
         f.email,
-        0 AS total_entradas,
-        0 AS volume_anual
+        0 AS total_entradas
       FROM fornecedores f
       ORDER BY f.nome ASC
     `
@@ -730,7 +718,12 @@ export async function createSupplier(payload: unknown) {
       VALUES ($1, $2, $3, $4)
       RETURNING id, nome
     `,
-    [input.nome, input.contato1, input.contato2 ?? null, input.email ?? null]
+    [
+      input.nome,
+      input.contato1 ?? null,
+      input.contato2 ?? null,
+      input.email ?? null
+    ]
   );
 
   return {

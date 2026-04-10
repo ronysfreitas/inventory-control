@@ -9,6 +9,32 @@ interface FeedbackState {
   message: string;
 }
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  if (!digits) {
+    return '';
+  }
+
+  if (digits.length <= 2) {
+    return `(${digits}`;
+  }
+
+  if (digits.length <= 6) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  }
+
+  if (digits.length <= 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
+function normalizeEmail(value: string) {
+  return value.replace(/\s+/g, '').toLowerCase();
+}
+
 export default function CreateSupplierForm({
   disabled = false
 }: CreateSupplierFormProps) {
@@ -40,7 +66,7 @@ export default function CreateSupplierForm({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message ?? 'Não foi possível cadastrar o fornecedor.');
+        throw new Error(result.message ?? 'Nao foi possivel cadastrar o fornecedor.');
       }
 
       form.reset();
@@ -56,7 +82,7 @@ export default function CreateSupplierForm({
         message:
           error instanceof Error
             ? error.message
-            : 'Não foi possível cadastrar o fornecedor.'
+            : 'Nao foi possivel cadastrar o fornecedor.'
       });
     } finally {
       setIsSubmitting(false);
@@ -68,29 +94,59 @@ export default function CreateSupplierForm({
       <header class="card__header">
         <div>
           <h2>Novo fornecedor</h2>
-          <p>Centralize os contatos usados nas entradas do estoque.</p>
+          <p>Cadastre parceiros e mantenha os dados de contato organizados.</p>
         </div>
       </header>
 
       <div class="form-grid">
         <label class="field field--span-2">
           <span class="field__label">Nome</span>
-          <input name="nome" type="text" placeholder="Distribuidora Horizonte" disabled={disabled} required />
+          <input name="nome" type="text" disabled={disabled} required />
         </label>
 
         <label class="field">
           <span class="field__label">Contato 1</span>
-          <input name="contato1" type="text" placeholder="(31) 99999-0000" disabled={disabled} required />
+          <input
+            name="contato1"
+            type="text"
+            inputMode="tel"
+            placeholder="(31) 99999-0000"
+            disabled={disabled}
+            onInput={(event) => {
+              const input = event.currentTarget as HTMLInputElement;
+              input.value = formatPhone(input.value);
+            }}
+          />
         </label>
 
         <label class="field">
           <span class="field__label">Contato 2</span>
-          <input name="contato2" type="text" placeholder="Opcional" disabled={disabled} />
+          <input
+            name="contato2"
+            type="text"
+            inputMode="tel"
+            placeholder="(31) 99999-0000"
+            disabled={disabled}
+            onInput={(event) => {
+              const input = event.currentTarget as HTMLInputElement;
+              input.value = formatPhone(input.value);
+            }}
+          />
         </label>
 
         <label class="field field--span-2">
           <span class="field__label">E-mail</span>
-          <input name="email" type="email" placeholder="compras@fornecedor.com" disabled={disabled} />
+          <input
+            name="email"
+            type="email"
+            inputMode="email"
+            placeholder="compras@fornecedor.com"
+            disabled={disabled}
+            onInput={(event) => {
+              const input = event.currentTarget as HTMLInputElement;
+              input.value = normalizeEmail(input.value);
+            }}
+          />
         </label>
       </div>
 

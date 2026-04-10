@@ -65,11 +65,10 @@ export interface DashboardData {
 export interface SupplierListItem {
   id: number;
   nome: string;
-  contato1: string;
+  contato1: string | null;
   contato2: string | null;
   email: string | null;
   totalEntradas: number;
-  volumeAnual: number;
 }
 
 export interface ProductCatalogData {

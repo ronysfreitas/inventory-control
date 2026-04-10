@@ -1,7 +1,6 @@
 ---
 import AppLayout from '../layouts/AppLayout.astro';
 import CreateSupplierForm from '../components/CreateSupplierForm.tsx';
-import { formatQuantity } from '../lib/formatters';
 import { getSupplierCatalogData } from '../lib/server/inventory-service';
 
 const data = await getSupplierCatalogData();
@@ -15,10 +14,9 @@ const data = await getSupplierCatalogData();
 >
   <section class="hero-panel">
     <span class="eyebrow">Rede de abastecimento</span>
-    <h1>Fornecedores centralizados para acelerar as entradas e medir volume anual.</h1>
+    <h1>Fornecedores centralizados para agilizar entradas e organizar contatos.</h1>
     <p class="body-copy">
-      O cadastro alimenta o histórico do produto e o ranking dos parceiros mais ativos
-      do último ano.
+      O cadastro apoia o lancamento das entradas e facilita a consulta dos parceiros.
     </p>
   </section>
 
@@ -29,7 +27,7 @@ const data = await getSupplierCatalogData();
       <header class="section-heading">
         <div>
           <h2>Fornecedores cadastrados</h2>
-          <p>Contatos, e-mails e participação no fluxo de entradas.</p>
+          <p>Contatos, e-mails e historico de entradas por fornecedor.</p>
         </div>
       </header>
 
@@ -42,7 +40,7 @@ const data = await getSupplierCatalogData();
                   <th>Fornecedor</th>
                   <th>Contatos</th>
                   <th>E-mail</th>
-                  <th>Histórico</th>
+                  <th>Historico</th>
                 </tr>
               </thead>
               <tbody>
@@ -50,15 +48,12 @@ const data = await getSupplierCatalogData();
                   <tr>
                     <td>{supplier.nome}</td>
                     <td>
-                      <div>{supplier.contato1}</div>
-                      <div class="muted">{supplier.contato2 ?? 'Sem contato secundário'}</div>
+                      <div>{supplier.contato1 ?? 'Sem contato principal'}</div>
+                      <div class="muted">{supplier.contato2 ?? 'Sem contato secundario'}</div>
                     </td>
                     <td>{supplier.email ?? 'Sem e-mail informado'}</td>
                     <td>
                       <div>{supplier.totalEntradas} entradas registradas</div>
-                      <div class="muted">
-                        Volume anual: {formatQuantity(supplier.volumeAnual)}
-                      </div>
                     </td>
                   </tr>
                 ))}
@@ -67,7 +62,7 @@ const data = await getSupplierCatalogData();
           </div>
         ) : (
           <div class="empty-state">
-            <p>Cadastre fornecedores para habilitar o lançamento de entradas.</p>
+            <p>Cadastre fornecedores para habilitar o lancamento de entradas.</p>
           </div>
         )
       }
