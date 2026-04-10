@@ -2,9 +2,7 @@ import { Pool, type PoolClient, type QueryResultRow } from 'pg';
 
 export class DatabaseNotConfiguredError extends Error {
   constructor() {
-    super(
-      'Banco não configurado. Defina DATABASE_URL para usar dados reais do PostgreSQL.'
-    );
+    super('Os dados do sistema ainda não estão disponíveis no momento.');
     this.name = 'DatabaseNotConfiguredError';
   }
 }

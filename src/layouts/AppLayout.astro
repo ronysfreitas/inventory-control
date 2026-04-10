@@ -28,7 +28,6 @@ const navItems = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -45,11 +44,11 @@ const navItems = [
           <span class="brand-mark">MB</span>
           <span class="brand-copy">
             <strong>Minas Brasil</strong>
-            <small>Estoque com Astro + PostgreSQL</small>
+            <small>Gestao de estoque</small>
           </span>
         </a>
 
-        <nav class="site-nav" aria-label="Navegação principal">
+        <nav class="site-nav" aria-label="Navegacao principal">
           {
             navItems.map((item) => (
               <a
@@ -69,8 +68,7 @@ const navItems = [
       {
         !databaseReady && (
           <aside class="setup-banner">
-            O banco ainda não está configurado. Defina <code>DATABASE_URL</code> e rode
-            o SQL em <code>database/schema.sql</code> para visualizar dados reais.
+            Alguns dados ainda nao estao disponiveis no momento.
           </aside>
         )
       }
@@ -80,7 +78,7 @@ const navItems = [
       </main>
 
       <footer class="site-footer">
-        <p>Operação de estoque sem login, backend simples no próprio Astro.</p>
+        <p>Controle de produtos, entradas, saidas e fornecedores em um unico painel.</p>
       </footer>
     </div>
   </body>

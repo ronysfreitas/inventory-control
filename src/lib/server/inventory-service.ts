@@ -303,25 +303,25 @@ function emptyDashboardData(): DashboardData {
       {
         label: 'Produtos cadastrados',
         value: '0',
-        detail: 'Configure o PostgreSQL para começar a operar.',
+        detail: 'Os dados aparecerão aqui assim que houver itens disponíveis.',
         tone: 'default'
       },
       {
         label: 'Saldo total em estoque',
         value: '0',
-        detail: 'Sem conexão com o banco no momento.',
+        detail: 'Nenhum saldo disponível para exibir neste momento.',
         tone: 'low'
       },
       {
         label: 'Entradas em 30 dias',
         value: '0',
-        detail: 'Os gráficos usarão dados reais assim que o banco for ligado.',
+        detail: 'As movimentações recentes serão exibidas aqui.',
         tone: 'medium'
       },
       {
         label: 'Saídas em 30 dias',
         value: '0',
-        detail: 'As rotas já estão prontas para registrar movimentações.',
+        detail: 'As saídas registradas aparecerão neste resumo.',
         tone: 'high'
       }
     ],
