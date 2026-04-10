@@ -9,11 +9,23 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro check",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^10.0.4",
     "@astrojs/preact": "^5.1.1",
     "astro": "^6.1.5",
-    "preact": "^10.29.1"
+    "chart.js": "^4.5.1",
+    "date-fns": "^4.1.0",
+    "pg": "^8.20.0",
+    "preact": "^10.29.1",
+    "sass": "^1.99.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@types/pg": "^8.20.0",
+    "typescript": "^5.9.3"
   }
 }
