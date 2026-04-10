@@ -24,6 +24,7 @@ Sistema web de estoque construído com Astro, Preact, TypeScript e PostgreSQL.
   - ranking de maiores fornecedores no último ano
   - gráficos de movimentação
 - SQL completo para criação da base
+- Docker Compose para subir o PostgreSQL localmente com o schema automático
 
 ## Estrutura importante
 
@@ -35,9 +36,10 @@ src/
   layouts/
   lib/
   pages/
+docker-compose.yml
 ```
 
-## Configuração
+## Configuração local rápida
 
 1. Instale as dependências:
 
@@ -47,11 +49,13 @@ npm install
 
 2. Crie um arquivo `.env` baseado em `.env.example`.
 
-3. Suba o PostgreSQL e execute o schema:
+3. Suba o banco com Docker:
 
 ```bash
-psql "$DATABASE_URL" -f database/schema.sql
+npm run db:up
 ```
+
+O arquivo [database/schema.sql](D:/Dev/minasbrasil/database/schema.sql) é executado automaticamente na primeira inicialização do container.
 
 4. Rode o projeto:
 
@@ -62,9 +66,20 @@ npm run dev
 ## Variáveis de ambiente
 
 ```env
+POSTGRES_DB=minasbrasil
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/minasbrasil
 DATABASE_SSL=false
 ```
+
+## Scripts úteis
+
+- `npm run db:up` sobe o PostgreSQL em Docker
+- `npm run db:down` para o container
+- `npm run db:logs` acompanha os logs do banco
+- `npm run db:reset` remove o volume do banco para recriar tudo do zero
 
 ## Observação sobre o cadastro de produto
 
