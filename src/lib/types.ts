@@ -116,6 +116,12 @@ export interface SupplierOption {
   nome: string;
 }
 
+export interface ProductSuggestion {
+  id: number;
+  codigo: string;
+  nome: string;
+}
+
 export interface ProductDetailsData {
   databaseReady: boolean;
   product: ProductWithPriority | null;

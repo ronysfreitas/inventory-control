@@ -11,6 +11,7 @@ import type {
   ExitRecord,
   ProductCatalogData,
   ProductDetailsData,
+  ProductSuggestion,
   ProductSupplierRankingItem,
   ProductWithPriority,
   StatusSummaryItem,
@@ -89,6 +90,12 @@ interface ExitQueryRow {
 interface ProductIdRow {
   id: NumericValue;
   codigo: string;
+}
+
+interface ProductSuggestionRow {
+  id: NumericValue;
+  codigo: string;
+  nome: string;
 }
 
 function toNumber(value: NumericValue | null | undefined) {
@@ -363,6 +370,47 @@ export async function getProductCatalogData(): Promise<ProductCatalogData> {
     databaseReady: true,
     products: await getProductsWithPriority()
   };
+}
+
+export async function searchProductSuggestions(
+  rawTerm: string
+): Promise<ProductSuggestion[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
+
+  const term = rawTerm.trim();
+
+  if (!term) {
+    return [];
+  }
+
+  const rows = await query<ProductSuggestionRow>(
+    `
+      SELECT
+        p.id,
+        p.codigo,
+        p.nome
+      FROM produtos p
+      WHERE p.codigo ILIKE $1
+         OR p.codigo ILIKE $2
+      ORDER BY
+        CASE
+          WHEN p.codigo ILIKE $1 THEN 0
+          ELSE 1
+        END,
+        LENGTH(p.codigo),
+        p.codigo ASC
+      LIMIT 8
+    `,
+    [`${term}%`, `%${term}%`]
+  );
+
+  return rows.map<ProductSuggestion>((row) => ({
+    id: toNumber(row.id),
+    codigo: row.codigo,
+    nome: row.nome
+  }));
 }
 
 export async function getSupplierCatalogData(): Promise<SupplierCatalogData> {
