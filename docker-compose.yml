@@ -1,18 +1,17 @@
-name: minasbrasil
+name: ${COMPOSE_PROJECT_NAME:-inventory-control}
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: minasbrasil
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-minasbrasil}
+      POSTGRES_DB: ${POSTGRES_DB:-inventory_control}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - minasbrasil-postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
@@ -22,5 +21,4 @@ services:
       start_period: 10s
 
 volumes:
-  minasbrasil-postgres-data:
-    name: minasbrasil-postgres-data
+  postgres-data:

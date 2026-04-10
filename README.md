@@ -1,4 +1,4 @@
-# Minas Brasil Estoque
+# inventory-control
 
 Sistema web de estoque construído com Astro, Preact, TypeScript e PostgreSQL.
 
@@ -47,7 +47,7 @@ docker-compose.yml
 npm install
 ```
 
-2. Crie um arquivo `.env` baseado em `.env.example`.
+2. Crie um arquivo `.env` baseado em `.env.example` e ajuste o branding do projeto nas variáveis `PUBLIC_APP_*`.
 
 3. Suba o banco com Docker:
 
@@ -55,7 +55,7 @@ npm install
 npm run db:up
 ```
 
-O arquivo [database/schema.sql](D:/Dev/minasbrasil/database/schema.sql) é executado automaticamente na primeira inicialização do container.
+O arquivo `database/schema.sql` é executado automaticamente na primeira inicialização do container.
 
 4. Rode o projeto:
 
@@ -66,11 +66,15 @@ npm run dev
 ## Variáveis de ambiente
 
 ```env
-POSTGRES_DB=minasbrasil
+PUBLIC_APP_NAME=inventory-control
+PUBLIC_APP_SHORT_NAME=IC
+PUBLIC_APP_TAGLINE=Gestao de estoque
+COMPOSE_PROJECT_NAME=inventory-control
+POSTGRES_DB=inventory_control
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/minasbrasil
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/inventory_control
 DATABASE_SSL=false
 ```
 

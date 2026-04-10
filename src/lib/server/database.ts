@@ -8,7 +8,7 @@ export class DatabaseNotConfiguredError extends Error {
 }
 
 const globalForPg = globalThis as typeof globalThis & {
-  __minasBrasilPool?: Pool;
+  __appPool?: Pool;
 };
 
 function createPool() {
@@ -38,11 +38,11 @@ export function getPool() {
     throw new DatabaseNotConfiguredError();
   }
 
-  if (!globalForPg.__minasBrasilPool) {
-    globalForPg.__minasBrasilPool = createPool();
+  if (!globalForPg.__appPool) {
+    globalForPg.__appPool = createPool();
   }
 
-  return globalForPg.__minasBrasilPool;
+  return globalForPg.__appPool;
 }
 
 export async function query<T extends QueryResultRow>(
