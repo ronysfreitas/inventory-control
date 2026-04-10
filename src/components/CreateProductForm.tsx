@@ -60,13 +60,13 @@ export default function CreateProductForm({
     description ??
     (isEditMode
       ? 'Atualize os dados cadastrais sem alterar o saldo atual do item.'
-      : 'Cadastre itens com estoque minimo e saldo inicial.');
+      : 'Cadastre itens com estoque mínimo e saldo inicial.');
   const actionLabel =
     submitLabel ??
     (isEditMode
       ? isSubmitting
         ? 'Salvando...'
-        : 'Salvar alteracoes'
+        : 'Salvar alterações'
       : isSubmitting
         ? 'Salvando...'
         : 'Salvar produto');
@@ -96,7 +96,7 @@ export default function CreateProductForm({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message ?? 'Nao foi possivel salvar o produto.');
+        throw new Error(result.message ?? 'Não foi possível salvar o produto.');
       }
 
       setFeedback({
@@ -124,7 +124,7 @@ export default function CreateProductForm({
         message:
           error instanceof Error
             ? error.message
-            : 'Nao foi possivel salvar o produto.'
+            : 'Não foi possível salvar o produto.'
       });
     } finally {
       setIsSubmitting(false);
@@ -150,7 +150,7 @@ export default function CreateProductForm({
 
       <div class="form-grid">
         <label class="field field--span-2">
-          <span class="field__label">Codigo do produto</span>
+          <span class="field__label">Código do produto</span>
           <input
             name="codigo"
             type="text"
@@ -186,7 +186,7 @@ export default function CreateProductForm({
         </label>
 
         <label class="field">
-          <span class="field__label">Estoque minimo</span>
+          <span class="field__label">Estoque mínimo</span>
           <input
             name="estoqueMinimo"
             type="number"

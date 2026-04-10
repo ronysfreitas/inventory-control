@@ -29,13 +29,13 @@ const showEditModal = Boolean(editingProduct);
 const showCreateModal = createRequested && !showEditModal;
 
 const productEditNote = editingProduct
-  ? `Estoque atual: ${formatQuantity(editingProduct.estoqueAtual)}. Minimo: ${formatQuantity(editingProduct.estoqueMinimo)}. Regular: ${formatQuantity(editingProduct.estoqueRegular)}. Ultima entrada: ${formatDate(editingProduct.lastEntryDate)}. Ultima saida: ${formatDate(editingProduct.lastExitDate)}. O saldo continua sendo atualizado por entradas e saidas.`
+  ? `Estoque atual: ${formatQuantity(editingProduct.estoqueAtual)}. Mínimo: ${formatQuantity(editingProduct.estoqueMinimo)}. Regular: ${formatQuantity(editingProduct.estoqueRegular)}. Última entrada: ${formatDate(editingProduct.lastEntryDate)}. Última saída: ${formatDate(editingProduct.lastExitDate)}. O saldo continua sendo atualizado por entradas e saídas.`
   : '';
 ---
 
 <AppLayout
   title="Cadastro de produtos"
-  description="Cadastro e catalogo dos itens controlados em estoque."
+  description="Cadastro e catálogo dos itens controlados em estoque."
   currentPath="/produtos"
   databaseReady={data.databaseReady}
 >
@@ -44,8 +44,8 @@ const productEditNote = editingProduct
       <span class="eyebrow">Cadastro principal</span>
       <h1>Produtos | Cadastro e atualizações</h1>
       <p class="body-copy">
-        Cada item ja nasce preparado para alimentar o dashboard, a busca por codigo
-        e as entradas e saidas operacionais.
+        Cada item já nasce preparado para alimentar o dashboard, a busca por código
+        e as entradas e saídas operacionais.
       </p>
     </div>
 
@@ -58,8 +58,8 @@ const productEditNote = editingProduct
     <article class="card">
       <header class="section-heading">
         <div>
-          <h2>Catalogo atual</h2>
-          <p>Todos os produtos com leitura rapida de estoque e historico.</p>
+          <h2>Catálogo atual</h2>
+          <p>Todos os produtos com leitura rápida de estoque e histórico.</p>
         </div>
 
         <a class="button button--primary" href="/produtos?novo=1">
@@ -73,11 +73,11 @@ const productEditNote = editingProduct
             <table>
               <thead>
                 <tr>
-                  <th>Codigo</th>
+                  <th>Código</th>
                   <th>Produto</th>
                   <th>Saldo atual</th>
                   <th>Status</th>
-                  <th>Acoes</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -98,7 +98,7 @@ const productEditNote = editingProduct
                     <td>
                       <strong>{formatQuantity(product.estoqueAtual)}</strong>
                       <div class="muted">{summarizeProductBalance(product)}</div>
-                      <div class="muted">Ultima entrada: {formatDate(product.lastEntryDate)}</div>
+                      <div class="muted">Última entrada: {formatDate(product.lastEntryDate)}</div>
                     </td>
                     <td>
                       <StatusChip
@@ -125,7 +125,7 @@ const productEditNote = editingProduct
           </div>
         ) : (
           <div class="empty-state">
-            <p>O catalogo aparecera aqui assim que o primeiro produto for cadastrado.</p>
+            <p>O catálogo aparecerá aqui assim que o primeiro produto for cadastrado.</p>
           </div>
         )
       }
@@ -172,13 +172,13 @@ const productEditNote = editingProduct
         </div>
       </div>
     ) : editNotFound ? (
-      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Produto nao encontrado">
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Produto não encontrado">
         <div class="catalog-modal__backdrop">
           <article class="catalog-modal__panel card">
             <div class="card__header">
               <div>
-                <h2>Produto nao encontrado</h2>
-                <p>O registro selecionado para edicao nao esta mais disponivel.</p>
+                <h2>Produto não encontrado</h2>
+                <p>O registro selecionado para edição não está mais disponível.</p>
               </div>
               <a href="/produtos" class="button button--secondary">Fechar</a>
             </div>

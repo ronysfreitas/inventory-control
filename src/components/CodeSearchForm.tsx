@@ -51,7 +51,7 @@ export default function CodeSearchForm({
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.message ?? 'Nao foi possivel buscar sugestoes.');
+          throw new Error(result.message ?? 'Não foi possível buscar sugestões.');
         }
 
         setSuggestions(Array.isArray(result.data) ? result.data : []);
@@ -92,7 +92,7 @@ export default function CodeSearchForm({
     const trimmed = code.trim();
 
     if (!trimmed) {
-      setError('Informe um codigo para pesquisar.');
+      setError('Informe um código para pesquisar.');
       return;
     }
 
@@ -136,7 +136,7 @@ export default function CodeSearchForm({
   return (
     <form class={`search-form ${compact ? 'search-form--compact' : ''}`} onSubmit={handleSubmit}>
       <label class="field">
-        <span class="field__label">Pesquisar produto por codigo</span>
+        <span class="field__label">Pesquisar produto por código</span>
         <div class="search-form__controls">
           <div class="search-form__input-wrap">
             <input
@@ -200,7 +200,7 @@ export default function CodeSearchForm({
               >
                 {isLoading ? (
                   <div class="search-form__suggestion search-form__suggestion--meta">
-                    Buscando codigos...
+                    Buscando códigos...
                   </div>
                 ) : suggestions.length ? (
                   suggestions.map((suggestion, index) => (
@@ -225,7 +225,7 @@ export default function CodeSearchForm({
                   ))
                 ) : (
                   <div class="search-form__suggestion search-form__suggestion--meta">
-                    Nenhum produto encontrado para este codigo.
+                    Nenhum produto encontrado para este código.
                   </div>
                 )}
               </div>

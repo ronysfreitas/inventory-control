@@ -25,7 +25,7 @@ export default function DeleteRecordButton({
     }
 
     const confirmed = window.confirm(
-      `Deseja realmente excluir ${resourceLabel}? Esta acao nao pode ser desfeita.`
+      `Deseja realmente excluir ${resourceLabel}? Esta ação não pode ser desfeita.`
     );
 
     if (!confirmed) {
@@ -42,12 +42,12 @@ export default function DeleteRecordButton({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message ?? `Nao foi possivel excluir ${resourceLabel}.`);
+        throw new Error(result.message ?? `Não foi possível excluir ${resourceLabel}.`);
       }
 
       setFeedback({
         type: 'success',
-        message: `${resourceLabel} excluido com sucesso. Atualizando a lista...`
+        message: `${resourceLabel} excluído com sucesso. Atualizando a lista...`
       });
 
       window.setTimeout(() => window.location.reload(), 700);
@@ -57,7 +57,7 @@ export default function DeleteRecordButton({
         message:
           error instanceof Error
             ? error.message
-            : `Nao foi possivel excluir ${resourceLabel}.`
+            : `Não foi possível excluir ${resourceLabel}.`
       });
     } finally {
       setIsSubmitting(false);

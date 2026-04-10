@@ -83,14 +83,14 @@ export default function CreateSupplierForm({
   const bodyCopy =
     description ??
     (isEditMode
-      ? 'Atualize os dados do parceiro sem afetar o historico de entradas.'
+      ? 'Atualize os dados do parceiro sem afetar o histórico de entradas.'
       : 'Cadastre parceiros e mantenha os dados de contato organizados.');
   const actionLabel =
     submitLabel ??
     (isEditMode
       ? isSubmitting
         ? 'Salvando...'
-        : 'Salvar alteracoes'
+        : 'Salvar alterações'
       : isSubmitting
         ? 'Salvando...'
         : 'Salvar fornecedor');
@@ -120,7 +120,7 @@ export default function CreateSupplierForm({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message ?? 'Nao foi possivel salvar o fornecedor.');
+        throw new Error(result.message ?? 'Não foi possível salvar o fornecedor.');
       }
 
       setFeedback({
@@ -148,7 +148,7 @@ export default function CreateSupplierForm({
         message:
           error instanceof Error
             ? error.message
-            : 'Nao foi possivel salvar o fornecedor.'
+            : 'Não foi possível salvar o fornecedor.'
       });
     } finally {
       setIsSubmitting(false);

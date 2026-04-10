@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro';
+﻿import type { APIRoute } from 'astro';
 
 import { jsonResponse, readRequestPayload, resolveErrorStatus } from '../../lib/server/api';
 import {
@@ -73,7 +73,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 
     return jsonResponse({
       ok: true,
-      message: 'Fornecedor excluido com sucesso.',
+      message: 'Fornecedor excluído com sucesso.',
       data: supplier
     });
   } catch (error) {
@@ -86,3 +86,4 @@ export const DELETE: APIRoute = async ({ request }) => {
     );
   }
 };
+

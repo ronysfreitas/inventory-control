@@ -112,7 +112,12 @@ export default function MovementForm({
         {requiresSupplier ? (
           <label class="field">
             <span class="field__label">Fornecedor</span>
-            <select name="fornecedorId" defaultValue={suppliers[0]?.id ?? ''} disabled={isDisabled} required>
+            <select
+              name="fornecedorId"
+              defaultValue={suppliers[0]?.id ?? ''}
+              disabled={isDisabled}
+              required
+            >
               {suppliers.map((supplier) => (
                 <option value={supplier.id}>{supplier.nome}</option>
               ))}
@@ -122,13 +127,29 @@ export default function MovementForm({
 
         <label class="field">
           <span class="field__label">Quantidade</span>
-          <input name="quantidade" type="number" min="0.01" step="0.01" defaultValue="1" disabled={isDisabled} required />
+          <input
+            name="quantidade"
+            type="number"
+            min="0.01"
+            step="0.01"
+            defaultValue="1"
+            disabled={isDisabled}
+            required
+          />
         </label>
 
         {requiresSupplier ? (
           <label class="field">
             <span class="field__label">Valor unitário</span>
-            <input name="valorUnitario" type="number" min="0" step="0.01" defaultValue="0" disabled={isDisabled} required />
+            <input
+              name="valorUnitario"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue="0"
+              disabled={isDisabled}
+              required
+            />
           </label>
         ) : null}
 
@@ -137,7 +158,11 @@ export default function MovementForm({
           <textarea
             name="observacao"
             rows={3}
-            placeholder={type === 'entrada' ? 'Nota fiscal, lote, observações...' : 'Motivo da saída, destino, observações...'}
+            placeholder={
+              type === 'entrada'
+                ? 'Nota fiscal, lote, observações...'
+                : 'Motivo da saída, destino, observações...'
+            }
             disabled={isDisabled}
           />
         </label>
@@ -149,11 +174,7 @@ export default function MovementForm({
 
       <div class="form-actions">
         <button type="submit" class="button button--primary" disabled={isDisabled || isSubmitting}>
-          {isSubmitting
-            ? 'Salvando...'
-            : type === 'entrada'
-              ? 'Salvar entrada'
-              : 'Salvar saída'}
+          {isSubmitting ? 'Salvando...' : type === 'entrada' ? 'Salvar entrada' : 'Salvar saída'}
         </button>
       </div>
     </form>

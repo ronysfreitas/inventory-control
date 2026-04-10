@@ -13,17 +13,17 @@ const dashboard = await getDashboardData();
 
 <AppLayout
   title="Dashboard de estoque"
-  description="Prioridade de compra, busca por codigo e leitura operacional do estoque."
+  description="Prioridade de compra, busca por código e leitura operacional do estoque."
   currentPath="/"
   databaseReady={dashboard.databaseReady}
 >
   <section class="hero-panel hero-grid">
     <div>
-      <span class="eyebrow">Operacao e reposicao</span>
+      <span class="eyebrow">Operação e reposição</span>
       <h1>Dashboard | Controle de Estoque</h1>
       <p class="body-copy">
         O painel destaca o que precisa de compra primeiro, mostra o fluxo recente
-        de entradas e saidas e acelera a consulta do item para movimentacao.
+        de entradas e saídas e acelera a consulta do item para movimentação.
       </p>
     </div>
 
@@ -37,7 +37,7 @@ const dashboard = await getDashboardData();
       <header class="section-heading">
         <div>
           <h2>Fila de compra por prioridade</h2>
-          <p>Itens ordenados do mais urgente ao mais estavel.</p>
+          <p>Itens ordenados do mais urgente ao mais estável.</p>
         </div>
       </header>
 
@@ -50,7 +50,7 @@ const dashboard = await getDashboardData();
                   <th>Produto</th>
                   <th>Status</th>
                   <th>Estoque</th>
-                  <th>Ultimas movimentacoes</th>
+                  <th>Últimas movimentações</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,7 +78,7 @@ const dashboard = await getDashboardData();
                     </td>
                     <td>
                       <div>Entrada: {formatDate(product.lastEntryDate)}</div>
-                      <div>Saida: {formatDate(product.lastExitDate)}</div>
+                      <div>Saída: {formatDate(product.lastExitDate)}</div>
                     </td>
                   </tr>
                 ))}
@@ -99,7 +99,7 @@ const dashboard = await getDashboardData();
       <header class="section-heading">
         <div>
           <h2>Resumo dos fornecedores mais ativos</h2>
-          <p>Ranking por quantidade total entregue no ultimo ano.</p>
+          <p>Ranking por quantidade total entregue no último ano.</p>
         </div>
       </header>
 
@@ -127,7 +127,7 @@ const dashboard = await getDashboardData();
           </div>
         ) : (
           <div class="empty-state">
-            <p>As entradas registradas no ano vao alimentar este ranking automaticamente.</p>
+            <p>As entradas registradas no ano vão alimentar este ranking automaticamente.</p>
           </div>
         )
       }

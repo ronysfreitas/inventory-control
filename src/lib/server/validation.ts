@@ -2,46 +2,46 @@ import { z } from 'zod';
 
 const numericInput = z.coerce
   .number({
-    message: 'Informe um numero valido.'
+    message: 'Informe um número válido.'
   })
   .refine((value) => Number.isFinite(value), {
-    message: 'Informe um numero valido.'
+    message: 'Informe um número válido.'
   });
 
 const emailInput = z
   .string()
   .trim()
   .toLowerCase()
-  .max(180, 'O e-mail deve ter no maximo 180 caracteres.')
+  .max(180, 'O e-mail deve ter no máximo 180 caracteres.')
   .refine((value) => z.email().safeParse(value).success, {
-    message: 'Informe um e-mail valido.'
+    message: 'Informe um e-mail válido.'
   });
 
 const productBaseSchema = z.object({
   codigo: z
     .string()
     .trim()
-    .min(1, 'Informe o codigo do produto.')
-    .max(60, 'O codigo deve ter no maximo 60 caracteres.')
+    .min(1, 'Informe o código do produto.')
+    .max(60, 'O código deve ter no máximo 60 caracteres.')
     .transform((value) => value.toUpperCase()),
   nome: z
     .string()
     .trim()
     .min(2, 'Informe o nome do produto.')
-    .max(180, 'O nome deve ter no maximo 180 caracteres.'),
+    .max(180, 'O nome deve ter no máximo 180 caracteres.'),
   unidadeCompra: z
     .string()
     .trim()
     .min(1, 'Informe a unidade de compra.')
-    .max(40, 'A unidade de compra deve ter no maximo 40 caracteres.'),
+    .max(40, 'A unidade de compra deve ter no máximo 40 caracteres.'),
   estoqueMinimo: numericInput.nonnegative(
-    'O estoque minimo nao pode ser negativo.'
+    'O estoque mínimo não pode ser negativo.'
   ),
   estoqueRegular: numericInput.nonnegative(
-    'O estoque regular nao pode ser negativo.'
+    'O estoque regular não pode ser negativo.'
   ),
   estoqueInicial: numericInput.nonnegative(
-    'O estoque inicial nao pode ser negativo.'
+    'O estoque inicial não pode ser negativo.'
   )
 });
 
@@ -53,7 +53,7 @@ function validateRegularStock(
     context.addIssue({
       code: 'custom',
       path: ['estoqueRegular'],
-      message: 'O estoque regular deve ser maior ou igual ao estoque minimo.'
+      message: 'O estoque regular deve ser maior ou igual ao estoque mínimo.'
     });
   }
 }
@@ -71,18 +71,18 @@ export const supplierInputSchema = z.object({
     .string()
     .trim()
     .min(2, 'Informe o nome do fornecedor.')
-    .max(180, 'O nome deve ter no maximo 180 caracteres.'),
+    .max(180, 'O nome deve ter no máximo 180 caracteres.'),
   contato1: z
     .string()
     .trim()
-    .max(120, 'O contato principal deve ter no maximo 120 caracteres.')
+    .max(120, 'O contato principal deve ter no máximo 120 caracteres.')
     .optional()
     .or(z.literal(''))
     .transform((value) => value || undefined),
   contato2: z
     .string()
     .trim()
-    .max(120, 'O contato secundario deve ter no maximo 120 caracteres.')
+    .max(120, 'O contato secundário deve ter no máximo 120 caracteres.')
     .optional()
     .transform((value) => value || undefined),
   email: z
@@ -95,7 +95,7 @@ export const entryInputSchema = z.object({
   codigoProduto: z
     .string()
     .trim()
-    .min(1, 'Informe o codigo do produto.')
+    .min(1, 'Informe o código do produto.')
     .max(60)
     .transform((value) => value.toUpperCase()),
   data: z.string().trim().min(1, 'Informe a data da entrada.'),
@@ -103,18 +103,18 @@ export const entryInputSchema = z.object({
     .number({
       message: 'Selecione um fornecedor.'
     })
-    .int('Selecione um fornecedor valido.')
-    .positive('Selecione um fornecedor valido.'),
+    .int('Selecione um fornecedor válido.')
+    .positive('Selecione um fornecedor válido.'),
   quantidade: numericInput.positive(
     'A quantidade da entrada deve ser maior que zero.'
   ),
   valorUnitario: numericInput.nonnegative(
-    'O valor unitario nao pode ser negativo.'
+    'O valor unitário não pode ser negativo.'
   ),
   observacao: z
     .string()
     .trim()
-    .max(300, 'A observacao deve ter no maximo 300 caracteres.')
+    .max(300, 'A observação deve ter no máximo 300 caracteres.')
     .optional()
     .transform((value) => value || undefined)
 });
@@ -123,17 +123,17 @@ export const exitInputSchema = z.object({
   codigoProduto: z
     .string()
     .trim()
-    .min(1, 'Informe o codigo do produto.')
+    .min(1, 'Informe o código do produto.')
     .max(60)
     .transform((value) => value.toUpperCase()),
-  data: z.string().trim().min(1, 'Informe a data da saida.'),
+  data: z.string().trim().min(1, 'Informe a data da saída.'),
   quantidade: numericInput.positive(
-    'A quantidade da saida deve ser maior que zero.'
+    'A quantidade da saída deve ser maior que zero.'
   ),
   observacao: z
     .string()
     .trim()
-    .max(300, 'A observacao deve ter no maximo 300 caracteres.')
+    .max(300, 'A observação deve ter no máximo 300 caracteres.')
     .optional()
     .transform((value) => value || undefined)
 });

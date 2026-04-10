@@ -17,7 +17,7 @@ const appShortName =
     .join('')
     .slice(0, 2) ||
   'ES';
-const appTagline = import.meta.env.PUBLIC_APP_TAGLINE?.trim() || 'Gestao de estoque';
+const appTagline = import.meta.env.PUBLIC_APP_TAGLINE?.trim() || 'Gestão de estoque';
 
 const {
   title,
@@ -59,7 +59,7 @@ const navItems = [
           </span>
         </a>
 
-        <nav class="site-nav" aria-label="Navegacao principal">
+        <nav class="site-nav" aria-label="Navegação principal">
           {
             navItems.map((item) => (
               <a
@@ -79,7 +79,7 @@ const navItems = [
       {
         !databaseReady && (
           <aside class="setup-banner">
-            Alguns dados ainda nao estao disponiveis no momento.
+            Alguns dados ainda não estão disponíveis no momento.
           </aside>
         )
       }

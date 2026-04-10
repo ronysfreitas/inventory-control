@@ -1,4 +1,4 @@
----
+﻿---
 import { format as formatDateFns } from 'date-fns';
 
 import AppLayout from '../../layouts/AppLayout.astro';
@@ -41,7 +41,7 @@ const movementConfig = {
         fill: true
       },
       {
-        label: 'Saídas',
+        label: 'SaÃ­das',
         data: data.movementSeries.map((item) => item.saidas),
         borderColor: '#b35e2e',
         backgroundColor: 'rgba(179, 94, 46, 0.1)',
@@ -97,7 +97,7 @@ const supplierConfig = {
 const stockConfig = {
   type: 'bar',
   data: {
-    labels: ['Posição atual'],
+    labels: ['PosiÃ§Ã£o atual'],
     datasets: [
       {
         label: 'Estoque atual',
@@ -106,7 +106,7 @@ const stockConfig = {
         borderRadius: 8
       },
       {
-        label: 'Estoque mínimo',
+        label: 'Estoque mÃ­nimo',
         data: [product?.estoqueMinimo ?? 0],
         backgroundColor: '#d97a0d',
         borderRadius: 8
@@ -137,7 +137,7 @@ const stockConfig = {
 
 <AppLayout
   title={product ? `${product.codigo} - ${product.nome}` : 'Detalhe do produto'}
-  description="Consulta operacional do produto por código com histórico, gráficos e lançamentos."
+  description="Consulta operacional do produto por cÃ³digo com histÃ³rico, grÃ¡ficos e lanÃ§amentos."
   databaseReady={data.databaseReady}
 >
   {
@@ -145,7 +145,7 @@ const stockConfig = {
       <>
         <section class="product-hero">
           <div class="meta-row">
-            <span class="eyebrow">Consulta por código</span>
+            <span class="eyebrow">Consulta por cÃ³digo</span>
             <StatusChip label={product.priority.label} tone={product.priority.tone} />
           </div>
 
@@ -153,8 +153,8 @@ const stockConfig = {
             <div>
               <h1>{product.nome}</h1>
               <p class="body-copy">
-                Código <strong>{product.codigo}</strong> com leitura operacional completa para
-                entradas, saídas e tomada de decisão de compra.
+                CÃ³digo <strong>{product.codigo}</strong> com leitura operacional completa para
+                entradas, saÃ­das e tomada de decisÃ£o de compra.
               </p>
 
               <div class="meta-row">
@@ -165,8 +165,8 @@ const stockConfig = {
                 <span class="meta-pill">
                   Estoque regular: {formatQuantity(product.estoqueRegular)}
                 </span>
-                <span class="meta-pill">Última entrada: {formatDate(product.lastEntryDate)}</span>
-                <span class="meta-pill">Última saída: {formatDate(product.lastExitDate)}</span>
+                <span class="meta-pill">Ãšltima entrada: {formatDate(product.lastEntryDate)}</span>
+                <span class="meta-pill">Ãšltima saÃ­da: {formatDate(product.lastExitDate)}</span>
               </div>
             </div>
 
@@ -184,15 +184,15 @@ const stockConfig = {
             tone={product.priority.tone}
           />
           <MetricCard
-            label="Entradas nos últimos 90 dias"
+            label="Entradas nos Ãºltimos 90 dias"
             value={formatQuantity(totalEntradas)}
             detail={`Investimento acumulado: ${formatCurrency(totalInvestido)}.`}
             tone="medium"
           />
           <MetricCard
-            label="Saídas nos últimos 90 dias"
+            label="SaÃ­das nos Ãºltimos 90 dias"
             value={formatQuantity(totalSaidas)}
-            detail={`Saldo líquido recente: ${formatQuantity(totalEntradas - totalSaidas)}.`}
+            detail={`Saldo lÃ­quido recente: ${formatQuantity(totalEntradas - totalSaidas)}.`}
             tone="high"
           />
           <MetricCard
@@ -225,8 +225,8 @@ const stockConfig = {
         <section class="stack-grid">
           <ChartCard
             client:load
-            title="Entradas x saídas em 90 dias"
-            description="Fluxo diário do produto no período recente."
+            title="Entradas x saÃ­das em 90 dias"
+            description="Fluxo diÃ¡rio do produto no perÃ­odo recente."
             config={movementConfig}
             hasData={data.movementSeries.length > 0}
           />
@@ -234,7 +234,7 @@ const stockConfig = {
           <ChartCard
             client:load
             title="Estoque atual comparado aos niveis"
-            description="Leitura objetiva frente ao minimo e ao regular."
+            description="Leitura objetiva frente ao mínimo e ao regular."
             config={stockConfig}
             hasData={true}
           />
@@ -244,8 +244,8 @@ const stockConfig = {
           <article class="card">
             <header class="section-heading">
               <div>
-                <h2>Entradas dos últimos 90 dias</h2>
-                <p>Inclui fornecedor, quantidade, valor unitário e total.</p>
+                <h2>Entradas dos Ãºltimos 90 dias</h2>
+                <p>Inclui fornecedor, quantidade, valor unitÃ¡rio e total.</p>
               </div>
             </header>
 
@@ -259,7 +259,7 @@ const stockConfig = {
                         <th>Data</th>
                         <th>Fornecedor</th>
                         <th>Quantidade</th>
-                        <th>Valor unitário</th>
+                        <th>Valor unitÃ¡rio</th>
                         <th>Total</th>
                       </tr>
                     </thead>
@@ -270,7 +270,7 @@ const stockConfig = {
                           <td>{formatDate(entry.data)}</td>
                           <td>
                             <div>{entry.fornecedorNome}</div>
-                            <div class="muted">{entry.observacao ?? 'Sem observação'}</div>
+                            <div class="muted">{entry.observacao ?? 'Sem observaÃ§Ã£o'}</div>
                           </td>
                           <td>{formatQuantity(entry.quantidade)}</td>
                           <td>{formatCurrency(entry.valorUnitario)}</td>
@@ -282,7 +282,7 @@ const stockConfig = {
                 </div>
               ) : (
                 <div class="empty-state">
-                  <p>As próximas entradas deste item aparecerão aqui automaticamente.</p>
+                  <p>As prÃ³ximas entradas deste item aparecerÃ£o aqui automaticamente.</p>
                 </div>
               )
             }
@@ -291,8 +291,8 @@ const stockConfig = {
           <article class="card">
             <header class="section-heading">
               <div>
-                <h2>Saídas dos últimos 90 dias</h2>
-                <p>Movimentações recentes de consumo ou expedição.</p>
+                <h2>SaÃ­das dos Ãºltimos 90 dias</h2>
+                <p>MovimentaÃ§Ãµes recentes de consumo ou expediÃ§Ã£o.</p>
               </div>
             </header>
 
@@ -305,7 +305,7 @@ const stockConfig = {
                         <th>ID</th>
                         <th>Data</th>
                         <th>Quantidade</th>
-                        <th>Observação</th>
+                        <th>ObservaÃ§Ã£o</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -314,7 +314,7 @@ const stockConfig = {
                           <td>{exit.id}</td>
                           <td>{formatDate(exit.data)}</td>
                           <td>{formatQuantity(exit.quantidade)}</td>
-                          <td>{exit.observacao ?? 'Sem observação'}</td>
+                          <td>{exit.observacao ?? 'Sem observaÃ§Ã£o'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -322,7 +322,7 @@ const stockConfig = {
                 </div>
               ) : (
                 <div class="empty-state">
-                  <p>As saídas registradas para este produto serão listadas aqui.</p>
+                  <p>As saÃ­das registradas para este produto serÃ£o listadas aqui.</p>
                 </div>
               )
             }
@@ -333,7 +333,7 @@ const stockConfig = {
           <article class="card">
             <header class="section-heading">
               <div>
-                <h2>Maiores fornecedores no último ano</h2>
+                <h2>Maiores fornecedores no Ãºltimo ano</h2>
                 <p>Ranking por quantidade total entregue deste produto.</p>
               </div>
             </header>
@@ -347,7 +347,7 @@ const stockConfig = {
                         <th>Fornecedor</th>
                         <th>Quantidade total</th>
                         <th>Entradas</th>
-                        <th>Última entrega</th>
+                        <th>Ãšltima entrega</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -364,7 +364,7 @@ const stockConfig = {
                 </div>
               ) : (
                 <div class="empty-state">
-                  <p>O ranking será gerado automaticamente quando houver entradas deste produto.</p>
+                  <p>O ranking serÃ¡ gerado automaticamente quando houver entradas deste produto.</p>
                 </div>
               )
             }
@@ -372,7 +372,7 @@ const stockConfig = {
 
           <ChartCard
             client:load
-            title="Participação dos fornecedores"
+            title="ParticipaÃ§Ã£o dos fornecedores"
             description="Volume anual entregue para este produto."
             config={supplierConfig}
             hasData={data.suppliersLastYear.length > 0}
@@ -382,10 +382,10 @@ const stockConfig = {
     ) : (
       <section class="hero-panel hero-grid">
         <div>
-          <span class="eyebrow">Produto não encontrado</span>
-          <h1>Nenhum item foi localizado para o código {codigo || 'informado'}.</h1>
+          <span class="eyebrow">Produto nÃ£o encontrado</span>
+          <h1>Nenhum item foi localizado para o cÃ³digo {codigo || 'informado'}.</h1>
           <p class="body-copy">
-            Verifique o código digitado ou use a busca abaixo para localizar outro produto.
+            Verifique o cÃ³digo digitado ou use a busca abaixo para localizar outro produto.
           </p>
         </div>
         <div class="hero-actions">
@@ -395,4 +395,5 @@ const stockConfig = {
     )
   }
 </AppLayout>
+
 

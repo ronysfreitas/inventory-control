@@ -14,7 +14,7 @@ export function evaluatePurchasePriority(
       score: 0,
       gap: 0,
       coverage: null,
-      reason: 'Sem estoque minimo e regular configurados para este produto.'
+      reason: 'Sem estoque mínimo e regular configurados para este produto.'
     };
   }
 
@@ -29,7 +29,7 @@ export function evaluatePurchasePriority(
       score: 140 + Math.max(gapToMin, 0) * 3,
       gap: gapToMin,
       coverage,
-      reason: 'No limite minimo ou abaixo. Reposicao imediata recomendada.'
+      reason: 'No limite mínimo ou abaixo. Reposição imediata recomendada.'
     };
   }
 
@@ -40,7 +40,7 @@ export function evaluatePurchasePriority(
       score: 95 + Math.max(gapToRegular, 0) * 2,
       gap: gapToRegular,
       coverage,
-      reason: 'Abaixo do estoque regular. Compra recomendada para reposicao.'
+      reason: 'Abaixo do estoque regular. Compra recomendada para reposição.'
     };
   }
 
@@ -61,7 +61,6 @@ export function evaluatePurchasePriority(
     score: Math.max(0, 20 - coverage * 4),
     gap: gapToRegular,
     coverage,
-    reason: 'Estoque confortavel acima do nivel regular.'
+    reason: 'Estoque confortável acima do nível regular.'
   };
 }
-

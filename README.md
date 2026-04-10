@@ -68,7 +68,7 @@ npm run dev
 ```env
 PUBLIC_APP_NAME=inventory-control
 PUBLIC_APP_SHORT_NAME=IC
-PUBLIC_APP_TAGLINE=Gestao de estoque
+PUBLIC_APP_TAGLINE=Gestão de estoque
 COMPOSE_PROJECT_NAME=inventory-control
 POSTGRES_DB=inventory_control
 POSTGRES_USER=postgres
@@ -84,6 +84,7 @@ DATABASE_SSL=false
 - `npm run db:down` para o container
 - `npm run db:logs` acompanha os logs do banco
 - `npm run db:reset` remove o volume do banco para recriar tudo do zero
+- `npm run check` valida o projeto com `astro check`
 
 ## Rotas principais
 
@@ -91,3 +92,15 @@ DATABASE_SSL=false
 - `/produtos` cadastro e catálogo de produtos
 - `/fornecedores` cadastro e catálogo de fornecedores
 - `/produto/[codigo]` detalhe do produto e movimentações
+
+## Instruções para o Codex
+
+- Sempre utilizar mensagens de commit no padrão semântico, com prefixos como `feat:`, `fix:`, `chore:`, `refactor:`, `docs:` e similares.
+- Nunca criar commit sem prefixo semântico.
+- Sempre escrever textos visíveis ao usuário em pt-BR, com acentuação correta.
+- Sempre revisar mensagens de erro, rótulos, placeholders, descrições, títulos e documentação para manter português natural e consistente.
+- Preservar os padrões visuais, estruturais e de nomenclatura já adotados no projeto.
+- Manter o nome do app configurável por variáveis de ambiente, sem hardcode de marca nos textos da interface.
+- Antes de concluir mudanças relevantes, validar o projeto com `npm run check`.
+- Não alterar rotas, contratos de API, nomes de tabelas ou identificadores internos sem necessidade clara.
+- Ao editar documentação ou exemplos, manter alinhamento com os valores atuais de `.env.example`, `docker-compose.yml` e `package.json`.

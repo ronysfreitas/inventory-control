@@ -26,8 +26,8 @@ const showCreateModal = createRequested && !showEditModal;
 
 const supplierEditNote = editingSupplier
   ? editingSupplier.totalEntradas > 0
-    ? `Este fornecedor ja possui ${editingSupplier.totalEntradas} entradas registradas. As alteracoes afetam apenas os dados cadastrais.`
-    : 'Este fornecedor ainda nao possui entradas registradas.'
+    ? `Este fornecedor já possui ${editingSupplier.totalEntradas} entradas registradas. As alterações afetam apenas os dados cadastrais.`
+    : 'Este fornecedor ainda não possui entradas registradas.'
   : '';
 ---
 
@@ -41,7 +41,7 @@ const supplierEditNote = editingSupplier
     <span class="eyebrow">Rede de abastecimento</span>
     <h1>Fornecedores | Cadastro e atualizações</h1>
     <p class="body-copy">
-      O cadastro apoia o lancamento das entradas e facilita a consulta dos parceiros.
+      O cadastro apoia o lançamento das entradas e facilita a consulta dos parceiros.
     </p>
   </section>
 
@@ -50,7 +50,7 @@ const supplierEditNote = editingSupplier
       <header class="section-heading">
         <div>
           <h2>Fornecedores cadastrados</h2>
-          <p>Contatos, e-mails e historico de entradas por fornecedor.</p>
+          <p>Contatos, e-mails e histórico de entradas por fornecedor.</p>
         </div>
 
         <a class="button button--primary" href="/fornecedores?novo=1">
@@ -67,8 +67,8 @@ const supplierEditNote = editingSupplier
                   <th>Fornecedor</th>
                   <th>Contatos</th>
                   <th>E-mail</th>
-                  <th>Historico</th>
-                  <th>Acoes</th>
+                  <th>Histórico</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -77,7 +77,7 @@ const supplierEditNote = editingSupplier
                     <td>{supplier.nome}</td>
                     <td>
                       <div>{supplier.contato1 ?? 'Sem contato principal'}</div>
-                      <div class="muted">{supplier.contato2 ?? 'Sem contato secundario'}</div>
+                      <div class="muted">{supplier.contato2 ?? 'Sem contato secundário'}</div>
                     </td>
                     <td>{supplier.email ?? 'Sem e-mail informado'}</td>
                     <td>
@@ -105,7 +105,7 @@ const supplierEditNote = editingSupplier
           </div>
         ) : (
           <div class="empty-state">
-            <p>Cadastre fornecedores para habilitar o lancamento de entradas.</p>
+            <p>Cadastre fornecedores para habilitar o lançamento de entradas.</p>
           </div>
         )
       }
@@ -151,13 +151,13 @@ const supplierEditNote = editingSupplier
         </div>
       </div>
     ) : editNotFound ? (
-      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Fornecedor nao encontrado">
+      <div class="catalog-modal" role="dialog" aria-modal="true" aria-label="Fornecedor não encontrado">
         <div class="catalog-modal__backdrop">
           <article class="catalog-modal__panel card">
             <div class="card__header">
               <div>
-                <h2>Fornecedor nao encontrado</h2>
-                <p>O registro selecionado para edicao nao esta mais disponivel.</p>
+                <h2>Fornecedor não encontrado</h2>
+                <p>O registro selecionado para edição não está mais disponível.</p>
               </div>
               <a href="/fornecedores" class="button button--secondary">Fechar</a>
             </div>

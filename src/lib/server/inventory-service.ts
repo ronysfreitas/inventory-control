@@ -1,4 +1,4 @@
-import type { PoolClient } from 'pg';
+﻿import type { PoolClient } from 'pg';
 
 import { formatCurrency, formatQuantity } from '../formatters';
 import { evaluatePurchasePriority } from '../prioridade';
@@ -314,9 +314,9 @@ function buildDashboardMetrics(
       tone: 'medium'
     },
     {
-      label: 'Saídas em 30 dias',
+      label: 'SaÃ­das em 30 dias',
       value: formatQuantity(saidas30Dias),
-      detail: `Balanço do período: ${formatQuantity(entradas30Dias - saidas30Dias)}.`,
+      detail: `BalanÃ§o do perÃ­odo: ${formatQuantity(entradas30Dias - saidas30Dias)}.`,
       tone: 'high'
     }
   ];
@@ -350,25 +350,25 @@ function emptyDashboardData(): DashboardData {
       {
         label: 'Produtos cadastrados',
         value: '0',
-        detail: 'Os dados aparecerão aqui assim que houver itens disponíveis.',
+        detail: 'Os dados aparecerÃ£o aqui assim que houver itens disponÃ­veis.',
         tone: 'default'
       },
       {
         label: 'Saldo total em estoque',
         value: '0',
-        detail: 'Nenhum saldo disponível para exibir neste momento.',
+        detail: 'Nenhum saldo disponÃ­vel para exibir neste momento.',
         tone: 'low'
       },
       {
         label: 'Entradas em 30 dias',
         value: '0',
-        detail: 'As movimentações recentes serão exibidas aqui.',
+        detail: 'As movimentaÃ§Ãµes recentes serÃ£o exibidas aqui.',
         tone: 'medium'
       },
       {
-        label: 'Saídas em 30 dias',
+        label: 'SaÃ­das em 30 dias',
         value: '0',
-        detail: 'As saídas registradas aparecerão neste resumo.',
+        detail: 'As saÃ­das registradas aparecerÃ£o neste resumo.',
         tone: 'high'
       }
     ],
@@ -773,7 +773,7 @@ async function findProductIdByCode(client: PoolClient, codigo: string) {
   const [product] = result.rows;
 
   if (!product) {
-    throw new Error('Produto não encontrado para o código informado.');
+    throw new Error('Produto nÃ£o encontrado para o cÃ³digo informado.');
   }
 
   return toNumber(product.id);
@@ -837,7 +837,7 @@ export async function updateProduct(productId: number, payload: unknown) {
   );
 
   if (!rows[0]) {
-    throw createRequestError('Produto nao encontrado para edicao.', 404);
+    throw createRequestError('Produto não encontrado para edição.', 404);
   }
 
   return {
@@ -870,7 +870,7 @@ export async function deleteProduct(productId: number) {
   const product = checks[0];
 
   if (!product) {
-    throw createRequestError('Produto nao encontrado para exclusao.', 404);
+    throw createRequestError('Produto não encontrado para exclusão.', 404);
   }
 
   if (toNumber(product.total_entradas) > 0 || toNumber(product.total_saidas) > 0) {
@@ -946,7 +946,7 @@ export async function updateSupplier(supplierId: number, payload: unknown) {
   );
 
   if (!rows[0]) {
-    throw createRequestError('Fornecedor nao encontrado para edicao.', 404);
+    throw createRequestError('Fornecedor não encontrado para edição.', 404);
   }
 
   return {
@@ -974,7 +974,7 @@ export async function deleteSupplier(supplierId: number) {
   const supplier = checks[0];
 
   if (!supplier) {
-    throw createRequestError('Fornecedor nao encontrado para exclusao.', 404);
+    throw createRequestError('Fornecedor não encontrado para exclusão.', 404);
   }
 
   if (toNumber(supplier.total_entradas) > 0) {
@@ -1065,7 +1065,7 @@ export function getFriendlyError(error: unknown) {
       }>;
     };
 
-    return zodError.issues?.[0]?.message ?? 'Dados inválidos.';
+    return zodError.issues?.[0]?.message ?? 'Dados invÃ¡lidos.';
   }
 
   if (typeof error === 'object' && error && 'code' in error) {
@@ -1075,15 +1075,15 @@ export function getFriendlyError(error: unknown) {
     };
 
     if (databaseError.code === '23505') {
-      return 'Já existe um registro com este identificador único.';
+      return 'JÃ¡ existe um registro com este identificador Ãºnico.';
     }
 
     if (databaseError.code === '23503') {
-      return 'Não foi possível relacionar o registro informado. Revise produto e fornecedor.';
+      return 'NÃ£o foi possÃ­vel relacionar o registro informado. Revise produto e fornecedor.';
     }
 
     if (databaseError.code === 'P0001') {
-      return databaseError.message ?? 'Regra de negócio do estoque não permitiu a operação.';
+      return databaseError.message ?? 'Regra de negÃ³cio do estoque nÃ£o permitiu a operaÃ§Ã£o.';
     }
   }
 
@@ -1095,7 +1095,7 @@ export function getFriendlyError(error: unknown) {
 }
 
 export function summarizeProductBalance(product: ProductWithPriority) {
-  return `${formatQuantity(product.estoqueAtual)} em estoque, minimo ${formatQuantity(
+  return `${formatQuantity(product.estoqueAtual)} em estoque, mínimo ${formatQuantity(
     product.estoqueMinimo
   )} e regular ${formatQuantity(product.estoqueRegular)}.`;
 }
@@ -1104,3 +1104,5 @@ export function summarizeFinancialImpact(entries: EntryRecord[]) {
   const total = entries.reduce((sum, item) => sum + item.valorTotal, 0);
   return formatCurrency(total);
 }
+
+
