@@ -1,0 +1,101 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import CodeSearchForm from '../components/CodeSearchForm.tsx';
+import CreateProductForm from '../components/CreateProductForm.tsx';
+import StatusChip from '../components/StatusChip.astro';
+import { formatDate, formatQuantity } from '../lib/formatters';
+import {
+  getProductCatalogData,
+  summarizeProductBalance
+} from '../lib/server/inventory-service';
+
+const data = await getProductCatalogData();
+---
+
+<AppLayout
+  title="Cadastro de produtos"
+  description="Cadastro e catálogo dos itens controlados em estoque."
+  currentPath="/produtos"
+  databaseReady={data.databaseReady}
+>
+  <section class="hero-panel hero-grid">
+    <div>
+      <span class="eyebrow">Cadastro principal</span>
+      <h1>Produtos com saldo, mínimo e prioridade de reposição no mesmo fluxo.</h1>
+      <p class="body-copy">
+        Cada item já nasce preparado para alimentar o dashboard, a busca por código
+        e as entradas e saídas operacionais.
+      </p>
+    </div>
+
+    <div class="hero-actions">
+      <CodeSearchForm client:load compact={true} />
+    </div>
+  </section>
+
+  <section class="split-grid">
+    <CreateProductForm client:load disabled={!data.databaseReady} />
+
+    <article class="card">
+      <header class="section-heading">
+        <div>
+          <h2>Catálogo atual</h2>
+          <p>Todos os produtos com leitura rápida de estoque e histórico.</p>
+        </div>
+      </header>
+
+      {
+        data.products.length ? (
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Produto</th>
+                  <th>Saldo atual</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.products.map((product) => (
+                  <tr>
+                    <td>
+                      <a
+                        class="table-link"
+                        href={`/produto/${encodeURIComponent(product.codigo)}`}
+                      >
+                        {product.codigo}
+                      </a>
+                    </td>
+                    <td>
+                      <div>{product.nome}</div>
+                      <div class="muted">
+                        {formatQuantity(product.quantidadePorUnidadeCompra)} por{' '}
+                        {product.unidadeCompra}
+                      </div>
+                    </td>
+                    <td>
+                      <strong>{formatQuantity(product.estoqueAtual)}</strong>
+                      <div class="muted">{summarizeProductBalance(product)}</div>
+                      <div class="muted">Última entrada: {formatDate(product.lastEntryDate)}</div>
+                    </td>
+                    <td>
+                      <StatusChip
+                        label={product.priority.label}
+                        tone={product.priority.tone}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>O catálogo aparecerá aqui assim que o primeiro produto for cadastrado.</p>
+          </div>
+        )
+      }
+    </article>
+  </section>
+</AppLayout>

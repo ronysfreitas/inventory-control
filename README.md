@@ -1,43 +1,78 @@
-# Astro Starter Kit: Minimal
+# Minas Brasil Estoque
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Sistema web de estoque construído com Astro, Preact, TypeScript e PostgreSQL.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-## 🚀 Project Structure
+- Astro com backend simples em rotas server-side
+- Preact para formulários assíncronos e gráficos
+- TypeScript em todo o projeto
+- SCSS para a camada visual
+- PostgreSQL como banco principal
 
-Inside of your Astro project, you'll see the following folders and files:
+## O que já está no projeto
+
+- Dashboard com prioridade de compra baseada em estoque atual x estoque mínimo
+- Busca de produto por código
+- Cadastro de produtos
+- Cadastro de fornecedores
+- Registro de entradas e saídas
+- Atualização automática do estoque ao movimentar entradas e saídas
+- Página detalhada do produto com:
+  - última entrada e última saída
+  - histórico de entradas e saídas dos últimos 90 dias
+  - ranking de maiores fornecedores no último ano
+  - gráficos de movimentação
+- SQL completo para criação da base
+
+## Estrutura importante
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+database/
+  schema.sql
+src/
+  components/
+  layouts/
+  lib/
+  pages/
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Configuração
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+1. Instale as dependências:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```bash
+npm install
+```
 
-## 🧞 Commands
+2. Crie um arquivo `.env` baseado em `.env.example`.
 
-All commands are run from the root of the project, from a terminal:
+3. Suba o PostgreSQL e execute o schema:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+```bash
+psql "$DATABASE_URL" -f database/schema.sql
+```
 
-## 👀 Want to learn more?
+4. Rode o projeto:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+npm run dev
+```
+
+## Variáveis de ambiente
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/minasbrasil
+DATABASE_SSL=false
+```
+
+## Observação sobre o cadastro de produto
+
+O campo `quantidade` solicitado no produto foi interpretado como `quantidade por unidade de compra`, para funcionar junto com `unidade de compra` sem conflitar com o campo de estoque atual.
+
+## Rotas principais
+
+- `/` dashboard
+- `/produtos` cadastro e catálogo de produtos
+- `/fornecedores` cadastro e catálogo de fornecedores
+- `/produto/[codigo]` detalhe do produto e movimentações

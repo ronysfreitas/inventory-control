@@ -1,0 +1,10 @@
+---
+interface Props {
+  label: string;
+  tone: 'critical' | 'high' | 'medium' | 'low';
+}
+
+const { label, tone } = Astro.props;
+---
+
+<span class:list={{ 'status-chip': true, [`status-chip--${tone}`]: true }}>{label}</span>

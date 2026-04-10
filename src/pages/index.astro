@@ -1,17 +1,274 @@
 ---
+import AppLayout from '../layouts/AppLayout.astro';
+import ChartCard from '../components/ChartCard.tsx';
+import CodeSearchForm from '../components/CodeSearchForm.tsx';
+import MetricCard from '../components/MetricCard.astro';
+import StatusChip from '../components/StatusChip.astro';
+import { formatDate, formatQuantity } from '../lib/formatters';
+import {
+  getDashboardData,
+  summarizeProductBalance
+} from '../lib/server/inventory-service';
 
+const dashboard = await getDashboardData();
+
+const statusConfig = {
+  type: 'doughnut',
+  data: {
+    labels: dashboard.statusSummary.map((item) => item.label),
+    datasets: [
+      {
+        data: dashboard.statusSummary.map((item) => item.total),
+        backgroundColor: ['#c73c2f', '#d97a0d', '#bea039', '#1d7b58'],
+        borderWidth: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }
+};
+
+const movementConfig = {
+  type: 'bar',
+  data: {
+    labels: dashboard.movementSeries.map((item) =>
+      item.day.slice(5).split('-').reverse().join('/')
+    ),
+    datasets: [
+      {
+        label: 'Entradas',
+        data: dashboard.movementSeries.map((item) => item.entradas),
+        backgroundColor: '#0f6165',
+        borderRadius: 8
+      },
+      {
+        label: 'Saídas',
+        data: dashboard.movementSeries.map((item) => item.saidas),
+        backgroundColor: '#b35e2e',
+        borderRadius: 8
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+};
+
+const supplierConfig = {
+  type: 'bar',
+  data: {
+    labels: dashboard.supplierRanking.map((item) => item.nome),
+    datasets: [
+      {
+        label: 'Quantidade total',
+        data: dashboard.supplierRanking.map((item) => item.totalQuantidade),
+        backgroundColor: '#0f6165',
+        borderRadius: 8
+      }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true
+      }
+    }
+  }
+};
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<AppLayout
+  title="Dashboard de estoque"
+  description="Prioridade de compra, busca por código e leitura operacional do estoque."
+  currentPath="/"
+  databaseReady={dashboard.databaseReady}
+>
+  <section class="hero-panel hero-grid">
+    <div>
+      <span class="eyebrow">Operação e reposição</span>
+      <h1>Estoque com prioridade de compra clara e consulta rápida por código.</h1>
+      <p class="body-copy">
+        O painel destaca o que precisa de compra primeiro, mostra o fluxo recente
+        de entradas e saídas e acelera a consulta do item para movimentação.
+      </p>
+
+      <div class="quick-links">
+        <a href="/produtos" class="quick-link">Cadastrar produto</a>
+        <a href="/fornecedores" class="quick-link">Cadastrar fornecedor</a>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <CodeSearchForm client:load />
+      <div class="meta-row">
+        <span class="meta-pill">Backend no Astro</span>
+        <span class="meta-pill">PostgreSQL</span>
+        <span class="meta-pill">Tudo em TypeScript</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="metrics-grid">
+    {
+      dashboard.metrics.map((metric) => (
+        <MetricCard
+          label={metric.label}
+          value={metric.value}
+          detail={metric.detail}
+          tone={metric.tone}
+        />
+      ))
+    }
+  </section>
+
+  <section class="split-grid">
+    <article class="card">
+      <header class="section-heading">
+        <div>
+          <h2>Fila de compra por prioridade</h2>
+          <p>Itens ordenados do mais urgente ao mais estável.</p>
+        </div>
+      </header>
+
+      {
+        dashboard.products.length ? (
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Status</th>
+                  <th>Estoque</th>
+                  <th>Últimas movimentações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dashboard.products.map((product) => (
+                  <tr>
+                    <td>
+                      <a
+                        class="table-link"
+                        href={`/produto/${encodeURIComponent(product.codigo)}`}
+                      >
+                        {product.codigo}
+                      </a>
+                      <div>{product.nome}</div>
+                      <div class="muted">{product.priority.reason}</div>
+                    </td>
+                    <td>
+                      <StatusChip
+                        label={product.priority.label}
+                        tone={product.priority.tone}
+                      />
+                    </td>
+                    <td>
+                      <strong>{formatQuantity(product.estoqueAtual)}</strong>
+                      <div class="muted">{summarizeProductBalance(product)}</div>
+                    </td>
+                    <td>
+                      <div>Entrada: {formatDate(product.lastEntryDate)}</div>
+                      <div>Saída: {formatDate(product.lastExitDate)}</div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>Nenhum produto encontrado ainda. Comece pelo cadastro de produtos.</p>
+          </div>
+        )
+      }
+    </article>
+
+    <div class="charts-grid">
+      <ChartCard
+        client:load
+        title="Distribuição de prioridades"
+        description="Leitura rápida do risco de ruptura no estoque."
+        config={statusConfig}
+        hasData={dashboard.statusSummary.some((item) => item.total > 0)}
+      />
+
+      <ChartCard
+        client:load
+        title="Entradas x saídas em 30 dias"
+        description="Volume diário de movimentações recentes."
+        config={movementConfig}
+        hasData={dashboard.movementSeries.length > 0}
+      />
+    </div>
+  </section>
+
+  <section class="split-grid">
+    <article class="card">
+      <header class="section-heading">
+        <div>
+          <h2>Resumo dos fornecedores mais ativos</h2>
+          <p>Ranking por quantidade total entregue no último ano.</p>
+        </div>
+      </header>
+
+      {
+        dashboard.supplierRanking.length ? (
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fornecedor</th>
+                  <th>Quantidade total</th>
+                  <th>Total de entradas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dashboard.supplierRanking.map((supplier) => (
+                  <tr>
+                    <td>{supplier.nome}</td>
+                    <td>{formatQuantity(supplier.totalQuantidade)}</td>
+                    <td>{supplier.totalEntradas}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>As entradas registradas no ano vão alimentar este ranking automaticamente.</p>
+          </div>
+        )
+      }
+    </article>
+
+    <ChartCard
+      client:load
+      title="Volume por fornecedor"
+      description="Quem mais abasteceu o estoque no período de 12 meses."
+      config={supplierConfig}
+      hasData={dashboard.supplierRanking.length > 0}
+    />
+  </section>
+</AppLayout>

@@ -1,0 +1,390 @@
+---
+import { format as formatDateFns } from 'date-fns';
+
+import AppLayout from '../../layouts/AppLayout.astro';
+import ChartCard from '../../components/ChartCard.tsx';
+import CodeSearchForm from '../../components/CodeSearchForm.tsx';
+import MetricCard from '../../components/MetricCard.astro';
+import MovementForm from '../../components/MovementForm.tsx';
+import StatusChip from '../../components/StatusChip.astro';
+import {
+  formatCoverage,
+  formatCurrency,
+  formatDate,
+  formatDateLong,
+  formatQuantity
+} from '../../lib/formatters';
+import { getProductDetailsData } from '../../lib/server/inventory-service';
+
+const codigo = Astro.params.codigo ?? '';
+const data = await getProductDetailsData(codigo);
+const product = data.product;
+const today = formatDateFns(new Date(), 'yyyy-MM-dd');
+
+const totalEntradas = data.entriesLast90Days.reduce((sum, item) => sum + item.quantidade, 0);
+const totalSaidas = data.exitsLast90Days.reduce((sum, item) => sum + item.quantidade, 0);
+const totalInvestido = data.entriesLast90Days.reduce((sum, item) => sum + item.valorTotal, 0);
+
+const movementConfig = {
+  type: 'line',
+  data: {
+    labels: data.movementSeries.map((item) =>
+      item.day.slice(5).split('-').reverse().join('/')
+    ),
+    datasets: [
+      {
+        label: 'Entradas',
+        data: data.movementSeries.map((item) => item.entradas),
+        borderColor: '#0f6165',
+        backgroundColor: 'rgba(15, 97, 101, 0.18)',
+        tension: 0.3,
+        fill: true
+      },
+      {
+        label: 'Saídas',
+        data: data.movementSeries.map((item) => item.saidas),
+        borderColor: '#b35e2e',
+        backgroundColor: 'rgba(179, 94, 46, 0.1)',
+        tension: 0.3,
+        fill: true
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+};
+
+const supplierConfig = {
+  type: 'bar',
+  data: {
+    labels: data.suppliersLastYear.map((item) => item.nome),
+    datasets: [
+      {
+        label: 'Quantidade fornecida',
+        data: data.suppliersLastYear.map((item) => item.totalQuantidade),
+        backgroundColor: '#0f6165',
+        borderRadius: 8
+      }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true
+      }
+    }
+  }
+};
+
+const stockConfig = {
+  type: 'bar',
+  data: {
+    labels: ['Posição atual'],
+    datasets: [
+      {
+        label: 'Estoque atual',
+        data: [product?.estoqueAtual ?? 0],
+        backgroundColor: '#0f6165',
+        borderRadius: 8
+      },
+      {
+        label: 'Estoque mínimo',
+        data: [product?.estoqueMinimo ?? 0],
+        backgroundColor: '#d97a0d',
+        borderRadius: 8
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+};
+---
+
+<AppLayout
+  title={product ? `${product.codigo} - ${product.nome}` : 'Detalhe do produto'}
+  description="Consulta operacional do produto por código com histórico, gráficos e lançamentos."
+  databaseReady={data.databaseReady}
+>
+  {
+    product ? (
+      <>
+        <section class="product-hero">
+          <div class="meta-row">
+            <span class="eyebrow">Consulta por código</span>
+            <StatusChip label={product.priority.label} tone={product.priority.tone} />
+          </div>
+
+          <div class="hero-grid">
+            <div>
+              <h1>{product.nome}</h1>
+              <p class="body-copy">
+                Código <strong>{product.codigo}</strong> com leitura operacional completa para
+                entradas, saídas e tomada de decisão de compra.
+              </p>
+
+              <div class="meta-row">
+                <span class="meta-pill">
+                  {formatQuantity(product.quantidadePorUnidadeCompra)} por {product.unidadeCompra}
+                </span>
+                <span class="meta-pill">
+                  Cobertura atual: {formatCoverage(product.priority.coverage)}
+                </span>
+                <span class="meta-pill">Última entrada: {formatDate(product.lastEntryDate)}</span>
+                <span class="meta-pill">Última saída: {formatDate(product.lastExitDate)}</span>
+              </div>
+            </div>
+
+            <div class="hero-actions">
+              <CodeSearchForm client:load initialValue={product.codigo} compact={true} />
+            </div>
+          </div>
+        </section>
+
+        <section class="metrics-grid">
+          <MetricCard
+            label="Estoque atual"
+            value={formatQuantity(product.estoqueAtual)}
+            detail={`Estoque mínimo definido em ${formatQuantity(product.estoqueMinimo)}.`}
+            tone={product.priority.tone}
+          />
+          <MetricCard
+            label="Entradas nos últimos 90 dias"
+            value={formatQuantity(totalEntradas)}
+            detail={`Investimento acumulado: ${formatCurrency(totalInvestido)}.`}
+            tone="medium"
+          />
+          <MetricCard
+            label="Saídas nos últimos 90 dias"
+            value={formatQuantity(totalSaidas)}
+            detail={`Saldo líquido recente: ${formatQuantity(totalEntradas - totalSaidas)}.`}
+            tone="high"
+          />
+          <MetricCard
+            label="Fornecedores ativos no ano"
+            value={`${data.suppliersLastYear.length}`}
+            detail="Ranking alimentado automaticamente a partir das entradas."
+            tone="low"
+          />
+        </section>
+
+        <section class="split-grid">
+          <MovementForm
+            client:load
+            type="entrada"
+            productCode={product.codigo}
+            suppliers={data.availableSuppliers}
+            disabled={!data.databaseReady}
+            today={today}
+          />
+
+          <MovementForm
+            client:load
+            type="saida"
+            productCode={product.codigo}
+            disabled={!data.databaseReady}
+            today={today}
+          />
+        </section>
+
+        <section class="charts-grid">
+          <ChartCard
+            client:load
+            title="Entradas x saídas em 90 dias"
+            description="Fluxo diário do produto no período recente."
+            config={movementConfig}
+            hasData={data.movementSeries.length > 0}
+          />
+
+          <ChartCard
+            client:load
+            title="Estoque atual comparado ao mínimo"
+            description="Leitura objetiva da folga de estoque."
+            config={stockConfig}
+            hasData={true}
+          />
+        </section>
+
+        <section class="split-grid">
+          <article class="card">
+            <header class="section-heading">
+              <div>
+                <h2>Entradas dos últimos 90 dias</h2>
+                <p>Inclui fornecedor, quantidade, valor unitário e total.</p>
+              </div>
+            </header>
+
+            {
+              data.entriesLast90Days.length ? (
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Fornecedor</th>
+                        <th>Quantidade</th>
+                        <th>Valor unitário</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.entriesLast90Days.map((entry) => (
+                        <tr>
+                          <td>{entry.id}</td>
+                          <td>{formatDate(entry.data)}</td>
+                          <td>
+                            <div>{entry.fornecedorNome}</div>
+                            <div class="muted">{entry.observacao ?? 'Sem observação'}</div>
+                          </td>
+                          <td>{formatQuantity(entry.quantidade)}</td>
+                          <td>{formatCurrency(entry.valorUnitario)}</td>
+                          <td>{formatCurrency(entry.valorTotal)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div class="empty-state">
+                  <p>As próximas entradas deste item aparecerão aqui automaticamente.</p>
+                </div>
+              )
+            }
+          </article>
+
+          <article class="card">
+            <header class="section-heading">
+              <div>
+                <h2>Saídas dos últimos 90 dias</h2>
+                <p>Movimentações recentes de consumo ou expedição.</p>
+              </div>
+            </header>
+
+            {
+              data.exitsLast90Days.length ? (
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Quantidade</th>
+                        <th>Observação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.exitsLast90Days.map((exit) => (
+                        <tr>
+                          <td>{exit.id}</td>
+                          <td>{formatDate(exit.data)}</td>
+                          <td>{formatQuantity(exit.quantidade)}</td>
+                          <td>{exit.observacao ?? 'Sem observação'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div class="empty-state">
+                  <p>As saídas registradas para este produto serão listadas aqui.</p>
+                </div>
+              )
+            }
+          </article>
+        </section>
+
+        <section class="split-grid">
+          <article class="card">
+            <header class="section-heading">
+              <div>
+                <h2>Maiores fornecedores no último ano</h2>
+                <p>Ranking por quantidade total entregue deste produto.</p>
+              </div>
+            </header>
+
+            {
+              data.suppliersLastYear.length ? (
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Fornecedor</th>
+                        <th>Quantidade total</th>
+                        <th>Entradas</th>
+                        <th>Última entrega</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.suppliersLastYear.map((supplier) => (
+                        <tr>
+                          <td>{supplier.nome}</td>
+                          <td>{formatQuantity(supplier.totalQuantidade)}</td>
+                          <td>{supplier.totalEntradas}</td>
+                          <td>{formatDateLong(supplier.ultimaEntrega)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div class="empty-state">
+                  <p>O ranking será gerado automaticamente quando houver entradas deste produto.</p>
+                </div>
+              )
+            }
+          </article>
+
+          <ChartCard
+            client:load
+            title="Participação dos fornecedores"
+            description="Volume anual entregue para este produto."
+            config={supplierConfig}
+            hasData={data.suppliersLastYear.length > 0}
+          />
+        </section>
+      </>
+    ) : (
+      <section class="hero-panel hero-grid">
+        <div>
+          <span class="eyebrow">Produto não encontrado</span>
+          <h1>Nenhum item foi localizado para o código {codigo || 'informado'}.</h1>
+          <p class="body-copy">
+            Verifique o código digitado ou use a busca abaixo para localizar outro produto.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <CodeSearchForm client:load initialValue={codigo} />
+        </div>
+      </section>
+    )
+  }
+</AppLayout>

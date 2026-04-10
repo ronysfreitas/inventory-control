@@ -1,0 +1,76 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import CreateSupplierForm from '../components/CreateSupplierForm.tsx';
+import { formatQuantity } from '../lib/formatters';
+import { getSupplierCatalogData } from '../lib/server/inventory-service';
+
+const data = await getSupplierCatalogData();
+---
+
+<AppLayout
+  title="Cadastro de fornecedores"
+  description="Cadastro e consulta dos fornecedores usados nas entradas do estoque."
+  currentPath="/fornecedores"
+  databaseReady={data.databaseReady}
+>
+  <section class="hero-panel">
+    <span class="eyebrow">Rede de abastecimento</span>
+    <h1>Fornecedores centralizados para acelerar as entradas e medir volume anual.</h1>
+    <p class="body-copy">
+      O cadastro alimenta o histórico do produto e o ranking dos parceiros mais ativos
+      do último ano.
+    </p>
+  </section>
+
+  <section class="split-grid">
+    <CreateSupplierForm client:load disabled={!data.databaseReady} />
+
+    <article class="card">
+      <header class="section-heading">
+        <div>
+          <h2>Fornecedores cadastrados</h2>
+          <p>Contatos, e-mails e participação no fluxo de entradas.</p>
+        </div>
+      </header>
+
+      {
+        data.suppliers.length ? (
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fornecedor</th>
+                  <th>Contatos</th>
+                  <th>E-mail</th>
+                  <th>Histórico</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.suppliers.map((supplier) => (
+                  <tr>
+                    <td>{supplier.nome}</td>
+                    <td>
+                      <div>{supplier.contato1}</div>
+                      <div class="muted">{supplier.contato2 ?? 'Sem contato secundário'}</div>
+                    </td>
+                    <td>{supplier.email ?? 'Sem e-mail informado'}</td>
+                    <td>
+                      <div>{supplier.totalEntradas} entradas registradas</div>
+                      <div class="muted">
+                        Volume anual: {formatQuantity(supplier.volumeAnual)}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>Cadastre fornecedores para habilitar o lançamento de entradas.</p>
+          </div>
+        )
+      }
+    </article>
+  </section>
+</AppLayout>
